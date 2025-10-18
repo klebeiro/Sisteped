@@ -84,7 +84,10 @@ sisteped/
 │ └─[3] sisteped.db
 ├─ kv/
 │ └─[4] main.kv
-└─[5] assets/ 
+├─[5] assets/ 
+├─[6] docs
+└─[7] screens
+
 ```
 
 1. Arquivo principal do app
@@ -92,6 +95,8 @@ sisteped/
 1. Banco de dados (gerado automaticamente)
 1. Layout declarativo Kivy
 1. Ícones, imagens, recursos gráficos
+1. Documentação
+1. Classes de telas
 
 ## Configuração do Ambiente (venv)
 
