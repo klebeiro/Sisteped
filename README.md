@@ -64,7 +64,7 @@ Uma ferramenta prática para professores: este projeto oferece um aplicativo que
 -- 
 
 ## Diagrama de Relacionamento
-![](docs/imagens/Diagrama%20de%20Relacionamento%20-%20Sisteped.png)
+![](docs/imagens/Diagram%20de%20Classes%20-%20Sisteped.png)
 
 
 
