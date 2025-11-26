@@ -222,4 +222,4 @@ Uma ferramenta prática para professores: este projeto oferece um aplicativo que
   Qualquer alteração de dados deve estar salva antes do backup.
 
 ---
-
+![](docs/imagens/use%20cases.png)
