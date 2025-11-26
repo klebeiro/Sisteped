@@ -224,25 +224,25 @@ Uma ferramenta prática para professores: este projeto oferece um aplicativo que
 ---
 
 ```mermaid
-usecaseDiagram
-    actor Professor
-    actor Coordenador
+graph TD
 
-    Professor --> (UC01 Cadastrar Aluno)
-    Professor --> (UC02 Registrar Nota)
-    Professor --> (UC04 Registrar Comportamento)
-    Professor --> (UC05 Analisar Desempenho)
-    Professor --> (UC06 Gerar Backup)
+    Professor -- Cadastrar Aluno --> UC01
+    Professor -- Registrar Nota --> UC02
+    Professor -- Registrar Comportamento --> UC04
+    Professor -- Analisar Desempenho --> UC05
+    Professor -- Gerar Backup --> UC06
 
-    Coordenador --> (UC05 Analisar Desempenho)
+    Coordenador -- Analisar Desempenho --> UC05
 
-    (UC02 Registrar Nota) ..> (UC03 Calcular Médias e Estatísticas) : <<extend>>
-    (UC04 Registrar Comportamento) ..> (UC05 Analisar Desempenho) : <<extend>>
+    UC02 -. extend .-> UC03
+    UC04 -. extend .-> UC05
 
-    (UC01 Cadastrar Aluno) ..> (UC06 Gerar Backup) : <<depends>>
-    (UC02 Registrar Nota) ..> (UC06 Gerar Backup) : <<depends>>
-    (UC04 Registrar Comportamento) ..> (UC06 Gerar Backup) : <<depends>>
+    UC01 -. depends .-> UC06
+    UC02 -. depends .-> UC06
+    UC04 -. depends .-> UC06
 
-    (UC03 Calcular Médias e Estatísticas) ..> (UC02 Registrar Nota) : <<depends>>
+    UC03 -. depends .-> UC02
+
+    classDef usecase fill:#eee,stroke:#333,stroke-width:1px,border-radius:8px;
+    class UC01,UC02,UC03,UC04,UC05,UC06 usecase;
 ```
-
