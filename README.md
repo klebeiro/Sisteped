@@ -223,26 +223,3 @@ Uma ferramenta prática para professores: este projeto oferece um aplicativo que
 
 ---
 
-```mermaid
-graph TD
-
-    Professor -- Cadastrar Aluno --> UC01
-    Professor -- Registrar Nota --> UC02
-    Professor -- Registrar Comportamento --> UC04
-    Professor -- Analisar Desempenho --> UC05
-    Professor -- Gerar Backup --> UC06
-
-    Coordenador -- Analisar Desempenho --> UC05
-
-    UC02 -. extend .-> UC03
-    UC04 -. extend .-> UC05
-
-    UC01 -. depends .-> UC06
-    UC02 -. depends .-> UC06
-    UC04 -. depends .-> UC06
-
-    UC03 -. depends .-> UC02
-
-    classDef usecase fill:#eee,stroke:#333,stroke-width:1px,border-radius:8px;
-    class UC01,UC02,UC03,UC04,UC05,UC06 usecase;
-```
