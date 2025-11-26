@@ -118,8 +118,131 @@ Uma ferramenta prática para professores: este projeto oferece um aplicativo que
 ## Diagrama de Relacionamento
 ![](docs/imagens/Diagram%20de%20Classes%20-%20Sisteped.png)
 
+## Casos de Uso
+### **UC01 – Cadastrar Aluno**
 
+**Ator:** Professor  
+**Objetivo:** Registrar um novo aluno no sistema.  
+**Descrição:** O professor insere os dados do aluno e salva no banco local.
 
+#### **Fluxo Básico**
+1. Professor acessa o menu **Alunos**.  
+2. Seleciona **Adicionar Aluno**.  
+3. Preenche nome, idade, turma e contato.  
+4. Confirma o cadastro.  
+5. Sistema salva no banco local *(SYS-01)*.
 
+#### **Dependências**
+- **DEPENDS → UC06 – Backup Manual:**  
+  O banco atualizado deve estar apto para ser incluído em um backup posteriormente.
 
+---
+
+### **UC02 – Registrar Nota do Aluno**
+
+**Ator:** Professor  
+**Objetivo:** Registrar a nota de um aluno com tags de conteúdo.
+
+#### **Fluxo Básico**
+1. Professor acessa um aluno ou turma.  
+2. Seleciona **Adicionar Nota**.  
+3. Define valor da nota e tags (competências/conteúdos).  
+4. Confirma.  
+5. Sistema atualiza o histórico do aluno *(NOT-01)*.
+
+#### **Extensões**
+- **EXTEND → UC03 – Calcular Médias Automáticas:**  
+  O cálculo de médias é opcional e é acionado após novas notas serem inseridas.
+
+---
+
+### **UC03 – Calcular Médias e Estatísticas**
+
+**Ator:** Professor  
+**Objetivo:** Obter médias por aluno, turma e conteúdo.
+
+#### **Fluxo Básico**
+1. Professor abre a tela de estatísticas.  
+2. Sistema calcula médias automáticas.  
+3. Exibe resultados *(NOT-02)*.
+
+#### **Dependências**
+- **DEPENDS → UC02 – Registrar Nota:**  
+  Não é possível calcular médias sem notas registradas.
+
+---
+
+### **UC04 – Registrar Comportamento**
+
+**Ator:** Professor  
+**Objetivo:** Criar um registro de comportamento de um aluno.
+
+#### **Fluxo Básico**
+1. Professor acessa o aluno.  
+2. Seleciona **Adicionar Comportamento**.  
+3. Escolhe tipo (positivo/negativo) e descreve.  
+4. Sistema salva e associa ao aluno *(COM-01)*.
+
+#### **Extensões**
+- **EXTEND → UC05 – Analisar Padrões de Comportamento:**  
+  A análise é opcional e pode ser acessada pela mesma tela.
+
+---
+
+### **UC05 – Analisar Desempenho e Comportamentos**
+
+**Ator:** Professor / Coordenador  
+**Objetivo:** Visualizar gráficos de notas, comportamentos e evolução temporal.
+
+#### **Fluxo Básico**
+1. Usuário acessa **Painel de Análises**.  
+2. Seleciona filtros (aluno, turma, conteúdo).  
+3. Sistema gera gráficos e indicadores *(MON-01, MON-02, MON-03)*.  
+4. Usuário navega pelos dados.
+
+#### **Extensões**
+- **EXTEND → UC04 – Registrar Comportamento:**  
+  Caso o usuário esteja visualizando comportamento e queira adicionar um novo direto dali.
+
+---
+
+### **UC06 – Gerar Backup Manual**
+
+**Ator:** Professor  
+**Objetivo:** Criar um arquivo de backup contendo todos os dados locais.
+
+#### **Fluxo Básico**
+1. Professor acessa **Configurações**.  
+2. Seleciona **Gerar Backup**.  
+3. Sistema compacta o banco local *(SYS-02)*.  
+4. Usuário salva o arquivo.
+
+#### **Dependências**
+- **DEPENDS → UC01, UC02, UC04:**  
+  Qualquer alteração de dados deve estar salva antes do backup.
+
+---
+
+```mermaid
+usecaseDiagram
+    actor Professor
+    actor Coordenador
+
+    Professor --> (UC01 Cadastrar Aluno)
+    Professor --> (UC02 Registrar Nota)
+    Professor --> (UC04 Registrar Comportamento)
+    Professor --> (UC05 Analisar Desempenho)
+    Professor --> (UC06 Gerar Backup)
+
+    Coordenador --> (UC05 Analisar Desempenho)
+
+    (UC02 Registrar Nota) ..> (UC03 Calcular Médias e Estatísticas) : <<extend>>
+    (UC04 Registrar Comportamento) ..> (UC05 Analisar Desempenho) : <<extend>>
+
+    (UC01 Cadastrar Aluno) ..> (UC06 Gerar Backup) : <<depends>>
+    (UC02 Registrar Nota) ..> (UC06 Gerar Backup) : <<depends>>
+    (UC04 Registrar Comportamento) ..> (UC06 Gerar Backup) : <<depends>>
+
+    (UC03 Calcular Médias e Estatísticas) ..> (UC02 Registrar Nota) : <<depends>>
+```
 
