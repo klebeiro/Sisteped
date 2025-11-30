@@ -81,154 +81,283 @@ A seguir, os requisitos funcionais foram organizados por módulos, conforme a ar
 \subsubsection*{ALU-01 – Cadastro de Alunos}
 \begin{itemize}
     \item Adicionar, editar e remover alunos.
-    \item Armazenar informações básicas: nome, idade, turma e contato opcional.
+        \begin{itemize}
+            \item Formulário de cadastro com campos do Aluno: 
+            nomeCompleto, dataNascimento, filiação, naturalidade, nacionalidade, identidade, CPF.
+            \item Permite adicionar dados de Endereço (rua, número, bairro, cidade) e Contato (telefone, email).
+            \item Validação em tempo real:
+            \begin{itemize}
+                \item CPF válido e único.
+                \item Data de nascimento coerente (idade mínima 6 anos).
+                \item Email com formato correto.
+            \end{itemize}
+            \item Botões: "Salvar", "Cancelar" e "Limpar campos".
+            \item Mensagens de erro exibidas em caso de dados inválidos.
+        \end{itemize}
 \end{itemize}
 
 \subsubsection*{ALU-02 – Histórico do Aluno}
 \begin{itemize}
     \item Visualizar histórico consolidado de notas e comportamentos por aluno.
+        \begin{itemize}
+            \item Exibe todas as Avaliação do aluno, incluindo conteúdo, nota, data e tipo.
+            \item Mostra Comportamentos registrados (tag, data, observação).
+            \item Filtros por período, disciplina ou tipo de comportamento.
+            \item Exportação em PDF ou CSV.
+            \item Indicadores visuais:
+            \begin{itemize}
+                \item Notas abaixo da média destacadas.
+                \item Comportamentos recorrentes sinalizados.
+            \end{itemize}
+        \end{itemize}
 \end{itemize}
 
 \subsubsection*{ALU-03 – Busca e Filtros de Alunos}
 \begin{itemize}
     \item Buscar alunos por nome, turma ou tags de comportamento/desempenho.
+        \begin{itemize}
+            \item Busca instantânea conforme o usuário digita.
+            \item Filtros combinados: turma, média de notas, tags de comportamento.
+            \item Ordenação por nome, idade, média ou quantidade de incidentes.
+            \item Resultados exibidos em tabela, com rolagem infinita.
+        \end{itemize}
 \end{itemize}
 
 %------------------------------------------------------
-\subsection{Módulo TUR – Turmas}
+\subsection{Módulo TUR – Turmas }
 
-\subsubsection*{TUR-01 – Gerenciamento de Turmas}
+\subsubsection*{TUR-01 – Manutenção de Turmas}
 \begin{itemize}
-    \item Criar turmas personalizadas.
-    \item Adicionar ou remover alunos de cada turma.
+    \item Cadastrar nova turma.
+        \begin{itemize}
+            \item Campos: nome, anoLetivo.
+            \item Validação: impedir duplicidade de nome no mesmo ano letivo.
+        \end{itemize}
+    \item Editar dados da turma.
+    \item Excluir ou inativar turmas.
+    \item Listar turmas cadastradas (visão simples de lista).
 \end{itemize}
 
-\subsubsection*{TUR-02 – Visão Geral da Turma}
+\subsubsection*{TUR-02 – Alocação de Pessoas}
 \begin{itemize}
-    \item Exibir resumo de desempenho médio da turma.
+    \item Gerenciar alunos na turma.
+        \begin{itemize}
+            \item Adicionar aluno à turma (relacionamento N:N).
+            \item Remover aluno da turma.
+            \item Validação: verificar se o aluno já está matriculado.
+        \end{itemize}
+    \item Gerenciar professores na turma.
+        \begin{itemize}
+            \item Vincular professores responsáveis.
+            \item Desvincular professor.
+        \end{itemize}
 \end{itemize}
 
 %------------------------------------------------------
-\subsection{Módulo NOT – Notas}
+\subsection{Módulo NOT – Notas }
 
-\subsubsection*{NOT-01 – Registro de Notas}
+\subsubsection*{NOT-01 – Registro de Avaliações e Notas}
 \begin{itemize}
-    \item Lançar notas individuais.
-    \item Adicionar tags de conteúdo ou competência.
-    \item Visualizar histórico por aluno ou turma.
+    \item Criar avaliação.
+        \begin{itemize}
+            \item Campos: descrição, data, tipo.
+        \end{itemize}
+    \item Lançar notas para os alunos.
+        \begin{itemize}
+            \item Entrada de valor numérico associado ao Aluno e à Avaliação.
+            \item Validação: aceitar apenas valores entre 0 e 10.
+        \end{itemize}
+    \item Editar nota lançada.
+    \item Excluir lançamento de nota.
 \end{itemize}
 
-\subsubsection*{NOT-02 – Média e Estatísticas}
+\subsubsection*{NOT-02 – Categorização de Conteúdo}
 \begin{itemize}
-    \item Calcular média por conteúdo, aluno e turma.
+    \item Gerenciar tags de conteúdo/competência.
+        \begin{itemize}
+            \item Criar, editar e excluir tags para associar às avaliações (ex: "Matemática", "Física").
+        \end{itemize}
+    \item Consultar notas lançadas (lista simples filtrada por aluno ou data).
 \end{itemize}
 
-\subsubsection*{NOT-03 – Notas por Conteúdo}
-\begin{itemize}
-    \item Filtrar notas por matéria, conteúdo ou competência.
-\end{itemize}
-
+%------------------------------------------------------
 %------------------------------------------------------
 \subsection{Módulo COM – Comportamentos}
 
-\subsubsection*{COM-01 – Registro de Comportamentos}
+\subsubsection*{COM-01 – Registro de Ocorrências}
 \begin{itemize}
-    \item Criar cards de comportamento.
-    \item Associar comportamentos a alunos.
-    \item Registrar histórico individual e por turma.
+    \item Registrar novo comportamento.
+        \begin{itemize}
+            \item Campos: aluno, tag (tipo de comportamento), data, observação textual.
+            \item Validação: data não pode ser futura.
+        \end{itemize}
+        
+    \item Editar observação ou data do comportamento.
+    \item Excluir registro de comportamento.
+
+    \item Registrar nova tag.
+        \begin{itemize}
+            \item Pode ser registrado novas tags.
+            \item Validação: Evita redundância nas tags.
+        \end{itemize}
+    \item Renomear tag.
+    \item Excluir tag.
 \end{itemize}
 
-\subsubsection*{COM-02 – Métricas de Frequência}
+\subsubsection*{COM-02 – Histórico Individual}
 \begin{itemize}
-    \item Identificar padrões de comportamentos positivos e negativos.
+    \item Listar comportamentos de um aluno específico.
+        \begin{itemize}
+            \item Visualização em lista cronológica simples (data e descrição).
+        \end{itemize}
 \end{itemize}
 
 %------------------------------------------------------
 \subsection{Módulo MON – Monitoramento e Análises}
 
-\subsubsection*{MON-01 – Análises Acadêmicas}
+\subsubsection*{MON-01 – Painel Acadêmico (Notas)}
 \begin{itemize}
-    \item Exibir gráficos e indicadores de desempenho.
+    \item Visualizar desempenho da Turma.
+        \begin{itemize}
+            \item Gráfico de média geral da turma por avaliação \textbf{(Gráfico de Colunas)}.
+            \item Distribuição de notas: quantos alunos acima/abaixo da média \textbf{(Gráfico de Rosca)}.
+        \end{itemize}
+    \item Visualizar desempenho do Aluno.
+        \begin{itemize}
+            \item Gráfico de evolução de notas ao longo do tempo \textbf{(Gráfico de Linha)}.
+            \item Comparativo do aluno em relação à média da turma \textbf{(Gráfico Combinado)}.
+        \end{itemize}
 \end{itemize}
 
-\subsubsection*{MON-02 – Análises Comportamentais}
+\subsubsection*{MON-02 – Painel Comportamental}
 \begin{itemize}
-    \item Análise de frequência por tipo de comportamento.
+    \item Métricas de frequência.
+        \begin{itemize}
+            \item Frequência por tipo de tag (ex: 30\% Conversa, 10\% Atraso) \textbf{(Gráfico de Barras Horizontais)}.
+            \item Identificação de padrões: dias com mais incidências \textbf{(Histograma Semanal)}.
+        \end{itemize}
+    \item Alertas e Destaques.
+        \begin{itemize}
+            \item Dashboard destacando alunos com maior recorrência de comportamentos \textbf{(Tabela com Barras)}.
+        \end{itemize}
 \end{itemize}
 
-\subsubsection*{MON-03 – Comparação Temporal}
+\subsubsection*{MON-03 – Visão Gerencial (Dashboard Professor)}
 \begin{itemize}
-    \item Comparação da evolução dos alunos ao longo do tempo.
-\end{itemize}
-
-\subsubsection*{MON-04 – Painel Geral do Professor}
-\begin{itemize}
-    \item Dashboard consolidado com visão de turmas, notas e alertas.
+    \item Visão consolidada (Overview).
+        \begin{itemize}
+            \item Resumo rápido em cards: "Média da Turma Hoje", "Total de Ocorrências" \textbf{(KPI Cards)}.
+        \end{itemize}
+    \item Comparação Temporal.
+        \begin{itemize}
+            \item Gráficos comparando o bimestre atual com o anterior \textbf{(Gráfico de Barras Agrupadas)}.
+        \end{itemize}
 \end{itemize}
 
 %------------------------------------------------------
-\subsection{Módulo REL – Relatórios}
+\subsection*{Glossário de Visualizações (Especificação Técnica)}
 
-\subsubsection*{REL-01 – Exportação e Relatórios}
 \begin{itemize}
-    \item Gerar relatórios para impressão ou compartilhamento.
-    \item Exportar para CSV ou PDF.
-\end{itemize}
-
-\subsubsection*{REL-02 – Relatório Consolidado da Turma}
-\begin{itemize}
-    \item Documento com médias, estatísticas e análises comportamentais.
+    \item \textbf{Gráfico de Colunas:} Comparação simples. Mostra a nota média de cada prova uma ao lado da outra.
+    
+    \item \textbf{Gráfico de Rosca:} Mostra a proporção. Ex: Metade da turma tirou nota azul, metade tirou nota vermelha.
+    
+    \item \textbf{Gráfico de Linha:} Mostra a evolução. Permite ver se as notas do aluno estão subindo ou descendo ao longo do ano.
+    
+    \item \textbf{Gráfico Combinado:} Junta barras (nota do aluno) e uma linha (média da turma) no mesmo lugar para comparar se o aluno foi melhor ou pior que a sala.
+    
+    \item \textbf{Gráfico de Barras Horizontais:} Lista os tipos de comportamento (ex: "Conversa"). É horizontal para caber o texto do nome do comportamento.
+    
+    \item \textbf{Histograma Semanal:} Gráfico simples que mostra qual dia da semana (Seg-Sex) teve mais ocorrências registradas.
+    
+    \item \textbf{Tabela com Barras:} Uma lista com o nome dos alunos mais indisciplinados, com uma barrinha colorida ao lado para destacar quem tem mais ocorrências.
+    
+    \item \textbf{KPI Cards:} Cartões com números grandes (ex: "7.5"). Serve para o professor bater o olho e saber a média ou total de faltas do dia.
+    
+    \item \textbf{Gráfico de Barras Agrupadas:} Coloca duas barras juntas (Bimestre 1 e Bimestre 2) para ver se a turma melhorou ou piorou de um bimestre para o outro.
 \end{itemize}
 
 %------------------------------------------------------
-\subsection{Módulo SYS – Sistema / Infraestrutura}
+\subsection{Módulo REL – Relatórios (Exportação Estática)}
 
-\subsubsection*{SYS-01 – Armazenamento Local}
+\subsubsection*{REL-01 – Listagens Simples}
 \begin{itemize}
-    \item Banco de dados local com suporte a modo offline.
+    \item Gerar lista de chamada/alunos da turma (PDF/CSV).
+    \item Gerar boletim simples (lista de notas por aluno).
+    \item Gerar extrato de comportamentos (lista textual de ocorrências para assinatura dos pais).
 \end{itemize}
 
-\subsubsection*{SYS-02 – Backup Local Manual}
-\begin{itemize}
-    \item Exportar e importar backups do banco.
-\end{itemize}
-
-\subsubsection*{SYS-03 – Tema Claro/Escuro}
-\begin{itemize}
-    \item Alternar entre temas para melhor usabilidade.
-\end{itemize}
 
 %------------------------------------------------------
 \section{Requisitos Não Funcionais}
 
-\subsection*{1. Usabilidade}
+\subsection*{1. Usabilidade (Experiência do Usuário)}
 \begin{itemize}
-    \item Ações principais em até 5 segundos.
-    \item Localização de funções em até 3 cliques.
+    \item \textbf{Eficiência de Uso:}
+        \begin{itemize}
+            \item Ações principais (lançar nota, registrar chamada) devem ser concluídas em até 5 segundos.
+            \item Feedback visual imediato (mensagens de sucesso ou erro) para qualquer ação do usuário.
+        \end{itemize}
+    \item \textbf{Facilidade de Aprendizado:}
+        \begin{itemize}
+            \item Localização de qualquer função do sistema em até 3 cliques a partir da tela inicial.
+            \item Interface limpa, utilizando ícones padrões e textos explicativos (tooltips) nos botões.
+        \end{itemize}
 \end{itemize}
 
-\subsection*{2. Performance}
+\subsection*{2. Performance (Desempenho)}
 \begin{itemize}
-    \item CRUD com resposta inferior a 200ms.
-    \item Filtros carregando em até 1s com 300+ alunos.
+    \item \textbf{Latência de Dados:}
+        \begin{itemize}
+            \item Operações de CRUD (Cadastro, Leitura, Atualização, Deleção) com tempo de resposta inferior a 200ms.
+            \item Otimização de queries SQL para evitar travamentos durante o salvamento.
+        \end{itemize}
+    \item \textbf{Carregamento de Listagens:}
+        \begin{itemize}
+            \item Filtros e relatórios carregando em até 1s, mesmo em cenários de carga com 300+ alunos registrados.
+            \item Paginação automática nas tabelas para não sobrecarregar a memória.
+        \end{itemize}
 \end{itemize}
 
-\subsection*{3. Segurança}
+\subsection*{3. Segurança (Proteção de Dados)}
 \begin{itemize}
-    \item Armazenamento com criptografia AES-256.
-    \item Backup íntegro em 100\% das tentativas.
+    \item \textbf{Integridade e Sigilo:}
+        \begin{itemize}
+            \item Armazenamento de dados sensíveis com criptografia padrão AES-256.
+            \item Senhas dos professores devem ser armazenadas utilizando Hash seguro (ex: bcrypt ou Argon2), nunca em texto plano.
+        \end{itemize}
+    \item \textbf{Disponibilidade:}
+        \begin{itemize}
+            \item Garantia de recuperação: Backup íntegro e funcional em 100\% das tentativas de restauração.
+            \item Controle de sessão com logout automático após período de inatividade.
+        \end{itemize}
 \end{itemize}
 
-\subsection*{4. Portabilidade}
+\subsection*{4. Portabilidade (Compatibilidade)}
 \begin{itemize}
-    \item Compatível com Windows, Linux e macOS.
-    \item Suporte a telas de 768px a 4K.
+    \item \textbf{Multiplataforma:}
+        \begin{itemize}
+            \item Compatível nativamente com os sistemas operacionais Windows (10/11), Linux (Distros principais) e macOS.
+            \item Instalação simplificada com dependências mínimas empacotadas.
+        \end{itemize}
+    \item \textbf{Adaptabilidade Visual:}
+        \begin{itemize}
+            \item Suporte a telas com resolução desde 768px (laptops antigos/tablets) até 4K (monitores modernos).
+            \item Layout responsivo que se ajusta ao redimensionamento da janela sem quebrar os componentes.
+        \end{itemize}
 \end{itemize}
 
-\subsection*{5. Escalabilidade}
+\subsection*{5. Escalabilidade (Crescimento)}
 \begin{itemize}
-    \item Impacto máximo de 10\% ao adicionar novos módulos.
-    \item Suporte a até 10 mil registros sem perda notável.
+    \item \textbf{Arquitetura Modular:}
+        \begin{itemize}
+            \item Estrutura de código organizada para garantir um impacto máximo de 10\% na performance ao adicionar novos módulos no futuro.
+            \item Baixo acoplamento entre as classes para facilitar manutenção.
+        \end{itemize}
+    \item \textbf{Volume de Dados:}
+        \begin{itemize}
+            \item Suporte robusto a até 10 mil registros (histórico de anos) sem perda notável de desempenho nas consultas.
+        \end{itemize}
 \end{itemize}
 
 %------------------------------------------------------
