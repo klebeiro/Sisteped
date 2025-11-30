@@ -122,3 +122,10 @@ Uma ferramenta prática para professores: este projeto oferece um aplicativo que
 Pasta: `/docs/casos de uso/`
 
 ![](docs/imagens/use%20cases.png)
+
+---
+
+## 3. Design (Protótipo)
+
+- **Protótipo Figma:** [Sisteped no Figma](https://www.figma.com/design/WE4tHmzitXWEictT3dCRfe/Sisteped?node-id=0-1&p=f&t=riyhdJc2rPYz6J4X-0)
+- **Como acessar:** Clique no link acima; caso seja solicitado, faça login no Figma. O protótipo está compartilhado por link — verifique as permissões se não conseguir visualizar.
