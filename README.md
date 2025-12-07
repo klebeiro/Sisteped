@@ -139,3 +139,91 @@ Pasta: `/docs/casos de uso/`
 1. Deve retornar Login bem-sucedido e o token (200)
 2. Deve retornar BadRequest  e o campo incorreto quando os dados estiverem num formato inválido for inválido (400)
 3. Deve retornar que as credenciais estão inválidas quando os dados forem passados corretamente mas o usuário não existir ou as credenciais estiverem erradas(401)
+
+## 5. Modelagem do Banco de Dados
+
+### **1. Turma**
+**Tabela:** `Turma`
+- **Id** (PK)
+- **CodigoTurma** (string)
+- **DescricaoTurma** (string)
+- **DiaHorario** (string)
+- **NomeDisciplina** (string)
+- **AnoLetivo** (int)
+
+**Relacionamentos:**
+- Turma × Aluno → N:N (`AlunoTurma`)
+- Turma × Atividade → 1:N
+
+---
+
+### **2. Aluno**
+**Tabela:** `Aluno`
+- **Id** (PK)
+- **Matricula** (string)
+- **NomeCompleto** (string)
+- **CPF** (string)
+- **Identidade** (string)
+- **NomePai** (string)
+- **NomeMae** (string)
+- **Email** (string)
+- **Telefone** (string)
+- **PerfilId** (FK → Perfil.Id)
+
+**Relacionamentos:**
+- Aluno × Turma → N:N (`AlunoTurma`)
+- Aluno × NotaAtividade → 1:N
+
+---
+
+### **3. Perfil**
+**Tabela:** `Perfil`
+- **Id** (PK)
+- **TipoPerfil** (string)  
+  *Exemplos:* conversador, bagunceiro, comportado
+
+**Relacionamentos:**
+- Perfil × Aluno → 1:N
+
+---
+
+### **4. AlunoTurma**  
+_Tabela associativa (N:N)_
+
+**Tabela:** `AlunoTurma`
+- **AlunoId** (FK → Aluno.Id)
+- **TurmaId** (FK → Turma.Id)
+
+**Chave primária composta:**  
+`PK(AlunoId, TurmaId)`
+
+---
+
+### **5. Atividade**
+**Tabela:** `Atividade`
+- **Id** (PK)
+- **NomeAtividade** (string)
+- **TurmaId** (FK → Turma.Id)
+- **DataAplicacao** (date)
+
+**Relacionamentos:**
+- Atividade × NotaAtividade → 1:N
+
+---
+
+### **6. NotaAtividade**
+**Tabela:** `NotaAtividade`
+- **Id** (PK)
+- **AlunoId** (FK → Aluno.Id)
+- **AtividadeId** (FK → Atividade.Id)
+- **Nota** (decimal)
+
+---
+
+### 📌 Resumo Geral dos Relacionamentos
+
+- **Aluno** N:N **Turma**  
+- **Turma** 1:N **Atividade**  
+- **Aluno** 1:N **NotaAtividade**  
+- **Atividade** 1:N **NotaAtividade**  
+- **Perfil** 1:N **Aluno**  
