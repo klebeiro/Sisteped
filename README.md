@@ -129,3 +129,13 @@ Pasta: `/docs/casos de uso/`
 
 - **Protótipo Figma:** [Sisteped no Figma](https://www.figma.com/design/WE4tHmzitXWEictT3dCRfe/Sisteped?node-id=0-1&p=f&t=riyhdJc2rPYz6J4X-0)
 - **Como acessar:** Clique no link acima; caso seja solicitado, faça login no Figma. O protótipo está compartilhado por link — verifique as permissões se não conseguir visualizar.
+
+## 4. Casos de teste
+### Cadastro
+1. Deve criar usuário com sucesso (201)
+2. Deve retornar BadRequest e o campo incorreto quando os dados estiverem num formato inválido (400)
+
+### Login
+1. Deve retornar Login bem-sucedido e o token (200)
+2. Deve retornar BadRequest  e o campo incorreto quando os dados estiverem num formato inválido for inválido (400)
+3. Deve retornar que as credenciais estão inválidas quando os dados forem passados corretamente mas o usuário não existir ou as credenciais estiverem erradas(401)
