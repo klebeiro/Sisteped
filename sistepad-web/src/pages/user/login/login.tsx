@@ -11,6 +11,7 @@ import {
 import { useSelector } from "react-redux";
 import { loginAction } from "@/store/user/actions/login";
 import { toast } from "react-toastify";
+import { resetUserStateAction } from "@/store/user/actions/reset";
 type LoginForm = {
   login: string;
   password: string;
@@ -38,10 +39,14 @@ export function Login(): ReactElement {
       })
     );
   };
+  useEffect(() => {
+    dispatch(resetUserStateAction());
+  }, []);
 
   useEffect(() => {
     if (successLogin) {
-      navigate("/dashboard");
+      toast.success("Login realizado com sucesso!");
+      navigate("/classes");
     } else if (error) toast.error(error);
   }, [successLogin, error, navigate]);
 

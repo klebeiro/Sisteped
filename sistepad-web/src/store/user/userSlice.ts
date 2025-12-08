@@ -1,6 +1,6 @@
 import type { UserState } from "./state";
 import { createSlice } from "@reduxjs/toolkit/react";
-import { loginReducers, registerReducers } from "./reducers";
+import { loginReducers, registerReducers, resetReducers } from "./reducers";
 
 const initialUserState: UserState = {
   loading: false,
@@ -13,7 +13,8 @@ export const userSlice = createSlice({
   extraReducers: (builder) => {
     loginReducers(builder);
     registerReducers(builder);
-
+    resetReducers(builder);
+    
     builder.addDefaultCase((state, action) => {});
   },
 });

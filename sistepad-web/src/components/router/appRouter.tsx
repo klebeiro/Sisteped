@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Login, Register } from "@/pages/user";
+import { ListClasses, Login, Register } from "@/pages/user";
 import type { ReactElement } from "react";
 
 const router = createBrowserRouter([
@@ -10,6 +10,10 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
+  },
+  {
+    path: "/classes",
+    element: <ListClasses />,
   }
 ]);
 

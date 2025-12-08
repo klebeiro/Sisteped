@@ -13,9 +13,11 @@ export const loginReducers = (builder : ActionReducerMapBuilder<UserState>) =>{
         state.token = action.payload.Token;
         state.user = action.payload.User;
         state.error = null;
+        state.successLogin = true;
     })
     .addCase(loginAction.rejected, (state, action) => {
         state.loading = false;
+        state.successLogin = false;
         state.error = action.payload as string;
     });
 }

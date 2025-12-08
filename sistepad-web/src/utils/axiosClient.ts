@@ -2,7 +2,7 @@ import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
 import { mapErrorResponse } from "./mapErrorResponse";
 
 export class AxiosClient {
-  static baseUrl: string = import.meta.env.VITE_API_URL || "";
+  static baseUrl: string = import.meta.env.VITE_BACKEND_API_URL || "";
 
   static async get<TResponse>(
     uri: string,
