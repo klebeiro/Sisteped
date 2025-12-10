@@ -3,11 +3,11 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using SistepedApi.DTOs.Request;
 
-namespace SistepedApi.Validators
+namespace SistepedApi.Validators.User
 {
-    public class UserCreateDTOValidator : AbstractValidator<UserCreateDTO>
+    public class UserValidator : AbstractValidator<UserCreateDTO>
     {
-        public UserCreateDTOValidator()
+        public UserValidator()
         {
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Email é obrigatório.")
