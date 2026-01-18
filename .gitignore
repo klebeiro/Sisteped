@@ -310,3 +310,4 @@ project.lock.json
 
 # Optional: if you store publishing files or artifacts in a folder
 artifacts/
+/sistepad-api/sisteped-api/sisteped.db

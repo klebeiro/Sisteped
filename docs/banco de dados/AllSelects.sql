@@ -1,3 +1,14 @@
+-- Usuario e Credenciais
+SELECT 
+    U.Id,
+    U.Name,
+    U.Email,
+    C.Role,
+    C.PasswordHash,
+    U.CreatedAt
+FROM Users U
+INNER JOIN UserCredentials C ON U.Id = C.UserId;
+
 -- Escola
 SELECT 
     idEscola,
@@ -41,7 +52,7 @@ SELECT
     idTurma
 FROM Aluno;
 
--- Endereço
+-- Endereï¿½o
 SELECT 
     idEndereco,
     rua,
@@ -59,7 +70,7 @@ SELECT
     idAluno
 FROM Contato;
 
--- Avaliação
+-- Avaliaï¿½ï¿½o
 SELECT 
     idAvaliacao,
     conteudo,

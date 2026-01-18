@@ -4,6 +4,26 @@ GO
 USE SistepedDB;
 GO
 
+CREATE TABLE Users (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(150) NOT NULL,
+    Email NVARCHAR(150) NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 NULL
+);
+GO
+
+CREATE TABLE UserCredentials (
+    UserId INT PRIMARY KEY,
+    PasswordHash NVARCHAR(MAX) NOT NULL,
+    Role NVARCHAR(50) NOT NULL DEFAULT 'User',
+    
+    CONSTRAINT FK_UserCredentials_Users 
+    FOREIGN KEY (UserId) REFERENCES Users(Id) 
+    ON DELETE CASCADE
+);
+GO
+
 CREATE TABLE Escola (
     idEscola INT PRIMARY KEY IDENTITY(1,1),
     instituicaoEscolar NVARCHAR(255) NOT NULL,

@@ -27,8 +27,14 @@ namespace SistepedApi.IoC
 
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
+            // BASE DE DADOS SQLITE (LOCAL)
             services.AddDbContext<SistepedDbContext>(options =>
                 options.UseSqlite("Data Source=sisteped.db"));
+
+            // BASE DE DADOS SQL SERVER (PRODUÇÃO)
+            //services.AddDbContext<SistepedDbContext>(options =>
+            //    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserCredentialRepository, UserCredentialRepository>();
