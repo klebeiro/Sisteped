@@ -1,12 +1,14 @@
-﻿using SistepedApi.DTOs.Request;
+using SistepedApi.DTOs.Request;
 using SistepedApi.DTOs.Response;
+using SistepedApi.Models.Enums;
 
 namespace SistepedApi.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<UserResponseDTO> GetByIdAsync(int id);
+        Task<UserResponseDTO?> GetByIdAsync(int id);
         Task<IEnumerable<UserResponseDTO>> GetAllAsync();
-        Task<UserResponseDTO> CreateAsync(UserCreateDTO dto);
+        Task<IEnumerable<UserResponseDTO>> GetByRoleAsync(UserRole role);
+        Task<UserResponseDTO?> CreateAsync(UserCreateDTO dto);
     }
 }

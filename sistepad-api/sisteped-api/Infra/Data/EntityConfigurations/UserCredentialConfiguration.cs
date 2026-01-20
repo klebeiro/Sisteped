@@ -1,16 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SistepedApi.Models;
+using SistepedApi.Models.Enums;
 
-public class UserCredentialConfiguration : IEntityTypeConfiguration<UserCredential>
+namespace SistepedApi.Infra.Data.EntityConfigurations
 {
-    public void Configure(EntityTypeBuilder<UserCredential> builder)
+    public class UserCredentialConfiguration : IEntityTypeConfiguration<UserCredential>
     {
-        builder.HasKey(uc => uc.UserId);
+        public void Configure(EntityTypeBuilder<UserCredential> builder)
+        {
+            builder.HasKey(uc => uc.UserId);
 
-        builder.HasOne(uc => uc.User)
-            .WithOne()
-            .HasForeignKey<UserCredential>(uc => uc.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(uc => uc.PasswordHash)
+                .IsRequired();
+
+            builder.Property(uc => uc.Role)
+                .HasConversion<int>()
+                .HasDefaultValue(UserRole.Guardian)
+                .IsRequired();
+        }
     }
 }

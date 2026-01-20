@@ -1,7 +1,6 @@
-﻿using System.Text.RegularExpressions;
 using FluentValidation;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using SistepedApi.DTOs.Request;
+using SistepedApi.Models.Enums;
 
 namespace SistepedApi.Validators.User
 {
@@ -21,20 +20,23 @@ namespace SistepedApi.Validators.User
                 .NotEmpty().WithMessage("Senha é obrigatória.")
                 .MinimumLength(8).WithMessage("Senha deve possuir pelo menos 8 caracteres")
                 .Equal(x => x.PasswordConfirmation).WithMessage("Senha e confirmação de senha devem ser iguais");
+
+            RuleFor(x => x.Role)
+                .IsInEnum().WithMessage("Tipo de usuário inválido. Use: 1 (Coordenador), 2 (Professor) ou 3 (Responsável).");
         }
+    }
 
-        public class UserCredentialDTOValidator : AbstractValidator<UserCredentialDTO>
+    public class UserCredentialDTOValidator : AbstractValidator<UserCredentialDTO>
+    {
+        public UserCredentialDTOValidator()
         {
-            public UserCredentialDTOValidator()
-            {
-                RuleFor(x => x.Email)
-                    .NotEmpty().WithMessage("Email é obrigatório.")
-                    .EmailAddress().WithMessage("Email não está no formato válido.");
+            RuleFor(x => x.Email)
+                .NotEmpty().WithMessage("Email é obrigatório.")
+                .EmailAddress().WithMessage("Email não está no formato válido.");
 
-                RuleFor(x => x.Password)
-                    .NotEmpty().WithMessage("Senha é obrigatória.")
-                    .MinimumLength(8).WithMessage("Senha deve possuir pelo menos 8 caracteres");
-            }
+            RuleFor(x => x.Password)
+                .NotEmpty().WithMessage("Senha é obrigatória.")
+                .MinimumLength(8).WithMessage("Senha deve possuir pelo menos 8 caracteres");
         }
     }
 }

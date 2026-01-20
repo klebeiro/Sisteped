@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SistepedApi.Models;
+using SistepedApi.Models.Enums;
 using SistepedApi.Repositories.Interfaces;
 using SistepedApi.Infra.Data;
 
@@ -27,6 +28,11 @@ namespace SistepedApi.Repositories
         public async Task<IEnumerable<User>> GetAllAsync()
         {
             return await _context.Users.ToListAsync();
+        }
+
+        public async Task<IEnumerable<User>> GetByRoleAsync(UserRole role)
+        {
+            return await _context.Users.Where(u => u.Role == role).ToListAsync();
         }
 
         public async Task<User> CreateAsync(User user, UserCredential userCredentials)

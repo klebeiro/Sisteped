@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using SistepedApi.DTOs.Request;
 using SistepedApi.DTOs.Response;
@@ -23,9 +23,9 @@ namespace SistepedApi.Services
         public JwtService(IConfiguration configuration, IUserRepository userRepository, IUserCredentialRepository userCredentialRepository, IMapper mapper)
         {
             _configuration = configuration;
-            _secretKey = _configuration["Jwt:SecretKey"];
-            _issuer = _configuration["Jwt:Issuer"];
-            _audience = _configuration["Jwt:Audience"];
+            _secretKey = _configuration["Jwt:SecretKey"] ?? string.Empty;
+            _issuer = _configuration["Jwt:Issuer"] ?? string.Empty;
+            _audience = _configuration["Jwt:Audience"] ?? string.Empty;
             _userRepository = userRepository;
             _userCredentialRepository = userCredentialRepository;
             _mapper = mapper;
@@ -50,7 +50,7 @@ namespace SistepedApi.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, registeredCredential.Role),
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat,
                     new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(),

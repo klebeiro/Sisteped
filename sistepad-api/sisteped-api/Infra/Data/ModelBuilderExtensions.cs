@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using SistepedApi.Infra.Data.EntityConfigurations;
 
 namespace SistepedApi.Infra.Data
 {

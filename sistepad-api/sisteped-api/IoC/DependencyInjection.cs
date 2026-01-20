@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -21,6 +21,17 @@ namespace SistepedApi.IoC
             services.AddAutoMapper(typeof(AutoMapperProfile));
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IGradeService, GradeService>();
+            services.AddScoped<IClassService, ClassService>();
+            services.AddScoped<IGradeClassService, GradeClassService>();
+            services.AddScoped<IClassTeacherService, ClassTeacherService>();
+            services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<IStudentGradeService, StudentGradeService>();
+            services.AddScoped<IAttendanceService, AttendanceService>();
+            services.AddScoped<IGridService, GridService>();
+            services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<IActivityService, ActivityService>();
+            services.AddScoped<IStudentActivityService, StudentActivityService>();
 
             return services;
         }
@@ -38,6 +49,17 @@ namespace SistepedApi.IoC
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserCredentialRepository, UserCredentialRepository>();
+            services.AddScoped<IGradeRepository, GradeRepository>();
+            services.AddScoped<IClassRepository, ClassRepository>();
+            services.AddScoped<IGradeClassRepository, GradeClassRepository>();
+            services.AddScoped<IClassTeacherRepository, ClassTeacherRepository>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<IStudentGradeRepository, StudentGradeRepository>();
+            services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+            services.AddScoped<IGridRepository, GridRepository>();
+            services.AddScoped<IReportRepository, ReportRepository>();
+            services.AddScoped<IActivityRepository, ActivityRepository>();
+            services.AddScoped<IStudentActivityRepository, StudentActivityRepository>();
 
             return services;
         }
@@ -120,9 +142,28 @@ namespace SistepedApi.IoC
                         ValidateAudience = true,
                         ValidAudience = audience,
                         ValidateLifetime = true,
-                        ClockSkew = TimeSpan.Zero
+                        ClockSkew = TimeSpan.Zero,
+                        RoleClaimType = System.Security.Claims.ClaimTypes.Role
                     };
                 });
+
+            return services;
+        }
+
+        public static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
+        {
+            services.AddAuthorizationBuilder()
+                // Política para Coordenadores - acesso total
+                .AddPolicy("CoordinatorOnly", policy =>
+                    policy.RequireRole("Coordinator"))
+                
+                // Política para Coordenadores e Professores
+                .AddPolicy("CoordinatorOrTeacher", policy =>
+                    policy.RequireRole("Coordinator", "Teacher"))
+                
+                // Política para todos os usuários autenticados
+                .AddPolicy("AllAuthenticated", policy =>
+                    policy.RequireAuthenticatedUser());
 
             return services;
         }

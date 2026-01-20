@@ -1,8 +1,9 @@
-﻿using AutoMapper;
+using AutoMapper;
 using SistepedApi.Repositories.Interfaces;
 using SistepedApi.DTOs.Request;
 using SistepedApi.DTOs.Response;
 using SistepedApi.Models;
+using SistepedApi.Models.Enums;
 using SistepedApi.Services.Interfaces;
 using SistepedApi.Resources;
 
@@ -34,6 +35,12 @@ namespace SistepedApi.Services
             return _mapper.Map<IEnumerable<UserResponseDTO>>(users);
         }
 
+        public async Task<IEnumerable<UserResponseDTO>> GetByRoleAsync(UserRole role)
+        {
+            var users = await _userRepository.GetByRoleAsync(role);
+            return _mapper.Map<IEnumerable<UserResponseDTO>>(users);
+        }
+
         public async Task<UserResponseDTO?> CreateAsync(UserCreateDTO dto)
         {
             var existingUser = await _userRepository.GetByEmailAsync(dto.Email);
@@ -44,6 +51,7 @@ namespace SistepedApi.Services
             }
 
             var user = _mapper.Map<User>(dto);
+            user.Role = dto.Role;
 
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
@@ -52,6 +60,7 @@ namespace SistepedApi.Services
                 UserId = user.Id,
                 User = user,
                 PasswordHash = passwordHash,
+                Role = dto.Role
             };
 
             var createdUser = await _userRepository.CreateAsync(user, userCredentials);

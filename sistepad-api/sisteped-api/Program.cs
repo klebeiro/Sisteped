@@ -11,6 +11,7 @@ builder.Services
     .AddValidators()
     .AddSwaggerDocumentation()
     .AddJwtAuthentication(builder.Configuration)
+    .AddAuthorizationPolicies()
     .AddCorsPolicy();
 
 var app = builder.Build();
