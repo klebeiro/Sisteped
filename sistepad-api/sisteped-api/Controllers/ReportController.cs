@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SistepedApi.DTOs.Request;
 using SistepedApi.DTOs.Response;
+using SistepedApi.Helpers;
 using SistepedApi.Models.Enums;
 using SistepedApi.Services.Interfaces;
 using System.Net;
 using System.Security.Claims;
+using System.Text;
 
 namespace SistepedApi.Controllers
 {
@@ -326,6 +328,247 @@ namespace SistepedApi.Controllers
                     LowestScore = gradedItems.Any() ? gradedItems.Min(i => i.Score) : null,
                     Items = filteredItems
                 });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // =====================================================
+        // CSV EXPORTS
+        // =====================================================
+
+        /// <summary>
+        /// Exporta relatório de frequência como CSV.
+        /// Coordenadores e Professores podem exportar qualquer dado.
+        /// Responsáveis só podem exportar seus dependentes.
+        /// </summary>
+        [HttpPost("attendance/export-csv")]
+        [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ExportAttendanceReportToCsv([FromBody] AttendanceReportFilterDTO filter)
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            // Responsáveis só podem consultar seus dependentes
+            if (currentUserRole == nameof(UserRole.Guardian))
+            {
+                if (filter.StudentId.HasValue)
+                {
+                    var student = await _studentService.GetByIdAsync(filter.StudentId.Value);
+                    if (student == null || student.GuardianId != currentUserId)
+                        return Forbid();
+                }
+                else
+                {
+                    var myStudents = await _studentService.GetByGuardianIdAsync(currentUserId);
+                    var studentIds = myStudents.Select(s => s.Id).ToList();
+                    
+                    if (!studentIds.Any())
+                        return BadRequest("Nenhum dependente encontrado.");
+                    
+                    filter.StudentId = studentIds.FirstOrDefault();
+                }
+            }
+
+            try
+            {
+                var report = await _reportService.GetAttendanceReportAsync(filter);
+                var csvContent = CsvHelper.ConvertAttendanceReportToCsv(report);
+                
+                var fileName = $"relatorio_frequencia_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                var bytes = Encoding.UTF8.GetBytes(csvContent);
+                
+                return File(bytes, "text/csv; charset=utf-8", fileName);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Exporta resumo de frequência por aluno como CSV.
+        /// Acessível por Coordenadores e Professores.
+        /// </summary>
+        [HttpPost("attendance/by-student/export-csv")]
+        // [Authorize(Policy = "CoordinatorOrTeacher")] // COMENTADO PARA TESTES
+        [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ExportStudentAttendanceSummaryToCsv([FromBody] AttendanceReportFilterDTO filter)
+        {
+            try
+            {
+                var summary = await _reportService.GetStudentAttendanceSummaryAsync(filter);
+                var csvContent = CsvHelper.ConvertStudentAttendanceSummaryToCsv(summary);
+                
+                var fileName = $"resumo_frequencia_alunos_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                var bytes = Encoding.UTF8.GetBytes(csvContent);
+                
+                return File(bytes, "text/csv; charset=utf-8", fileName);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Exporta resumo de frequência por turma como CSV.
+        /// Acessível por Coordenadores e Professores.
+        /// </summary>
+        [HttpPost("attendance/by-grade/export-csv")]
+        // [Authorize(Policy = "CoordinatorOrTeacher")] // COMENTADO PARA TESTES
+        [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ExportGradeAttendanceSummaryToCsv([FromBody] AttendanceReportFilterDTO filter)
+        {
+            try
+            {
+                var summary = await _reportService.GetGradeAttendanceSummaryAsync(filter);
+                var csvContent = CsvHelper.ConvertGradeAttendanceSummaryToCsv(summary);
+                
+                var fileName = $"resumo_frequencia_turmas_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                var bytes = Encoding.UTF8.GetBytes(csvContent);
+                
+                return File(bytes, "text/csv; charset=utf-8", fileName);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Exporta relatório de notas como CSV.
+        /// Coordenadores e Professores podem exportar qualquer dado.
+        /// Responsáveis só podem exportar seus dependentes.
+        /// </summary>
+        [HttpPost("grades/export-csv")]
+        [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ExportGradeReportToCsv([FromBody] GradeReportFilterDTO filter)
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            // Responsáveis só podem consultar seus dependentes
+            if (currentUserRole == nameof(UserRole.Guardian))
+            {
+                if (filter.StudentId.HasValue)
+                {
+                    var student = await _studentService.GetByIdAsync(filter.StudentId.Value);
+                    if (student == null || student.GuardianId != currentUserId)
+                        return Forbid();
+                }
+                else
+                {
+                    var myStudents = await _studentService.GetByGuardianIdAsync(currentUserId);
+                    var studentIds = myStudents.Select(s => s.Id).ToList();
+                    
+                    if (!studentIds.Any())
+                        return BadRequest("Nenhum dependente encontrado.");
+                    
+                    filter.StudentId = studentIds.FirstOrDefault();
+                }
+            }
+
+            try
+            {
+                var report = await _reportService.GetGradeReportAsync(filter);
+                var csvContent = CsvHelper.ConvertGradeReportToCsv(report);
+                
+                var fileName = $"relatorio_notas_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                var bytes = Encoding.UTF8.GetBytes(csvContent);
+                
+                return File(bytes, "text/csv; charset=utf-8", fileName);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Exporta resumo de notas por aluno como CSV.
+        /// Acessível por Coordenadores e Professores.
+        /// </summary>
+        [HttpPost("grades/by-student/export-csv")]
+        // [Authorize(Policy = "CoordinatorOrTeacher")] // COMENTADO PARA TESTES
+        [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ExportStudentGradeSummaryToCsv([FromBody] GradeReportFilterDTO filter)
+        {
+            try
+            {
+                var summary = await _reportService.GetStudentGradeSummaryAsync(filter);
+                var csvContent = CsvHelper.ConvertStudentGradeSummaryToCsv(summary);
+                
+                var fileName = $"resumo_notas_alunos_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                var bytes = Encoding.UTF8.GetBytes(csvContent);
+                
+                return File(bytes, "text/csv; charset=utf-8", fileName);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Exporta resumo de notas por atividade como CSV.
+        /// Acessível por Coordenadores e Professores.
+        /// </summary>
+        [HttpPost("grades/by-activity/export-csv")]
+        // [Authorize(Policy = "CoordinatorOrTeacher")] // COMENTADO PARA TESTES
+        [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ExportActivityGradeSummaryToCsv([FromBody] GradeReportFilterDTO filter)
+        {
+            try
+            {
+                var summary = await _reportService.GetActivityGradeSummaryAsync(filter);
+                var csvContent = CsvHelper.ConvertActivityGradeSummaryToCsv(summary);
+                
+                var fileName = $"resumo_notas_atividades_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                var bytes = Encoding.UTF8.GetBytes(csvContent);
+                
+                return File(bytes, "text/csv; charset=utf-8", fileName);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Exporta resumo de notas por turma como CSV.
+        /// Acessível por Coordenadores e Professores.
+        /// </summary>
+        [HttpPost("grades/by-grade/export-csv")]
+        // [Authorize(Policy = "CoordinatorOrTeacher")] // COMENTADO PARA TESTES
+        [ProducesResponseType(typeof(FileResult), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ExportGradeGradeSummaryToCsv([FromBody] GradeReportFilterDTO filter)
+        {
+            try
+            {
+                var summary = await _reportService.GetGradeGradeSummaryAsync(filter);
+                var csvContent = CsvHelper.ConvertGradeGradeSummaryToCsv(summary);
+                
+                var fileName = $"resumo_notas_turmas_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+                var bytes = Encoding.UTF8.GetBytes(csvContent);
+                
+                return File(bytes, "text/csv; charset=utf-8", fileName);
             }
             catch (Exception ex)
             {

@@ -69,9 +69,9 @@ namespace SistepedApi.Services
                     StudentId = g.Key.StudentId,
                     StudentName = g.Key.Name,
                     Enrollment = g.Key.Enrollment,
-                    TotalDays = g.Count(),
-                    PresentDays = g.Count(a => a.Present),
-                    AbsentDays = g.Count(a => !a.Present),
+                    TotalRecords = g.Count(),
+                    TotalPresent = g.Count(a => a.Present),
+                    TotalAbsent = g.Count(a => !a.Present),
                     AttendancePercentage = g.Any() 
                         ? Math.Round((double)g.Count(a => a.Present) / g.Count() * 100, 2) 
                         : 0

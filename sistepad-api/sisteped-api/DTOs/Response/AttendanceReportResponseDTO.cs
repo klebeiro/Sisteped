@@ -39,10 +39,15 @@ namespace SistepedApi.DTOs.Response
         public int StudentId { get; set; }
         public string StudentName { get; set; } = string.Empty;
         public string Enrollment { get; set; } = string.Empty;
-        public int TotalDays { get; set; }
-        public int PresentDays { get; set; }
-        public int AbsentDays { get; set; }
+        public int TotalRecords { get; set; }
+        public int TotalPresent { get; set; }
+        public int TotalAbsent { get; set; }
         public double AttendancePercentage { get; set; }
+        
+        // Propriedades legadas para compatibilidade
+        public int TotalDays => TotalRecords;
+        public int PresentDays => TotalPresent;
+        public int AbsentDays => TotalAbsent;
     }
 
     public class GradeAttendanceSummaryDTO
