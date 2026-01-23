@@ -12,7 +12,8 @@ DELETE FROM Activities;
 DELETE FROM Attendances;
 DELETE FROM StudentGrades;
 DELETE FROM ClassTeachers;
-DELETE FROM GradeClasses;
+DELETE FROM GridClasses;
+DELETE FROM GridGrades;
 DELETE FROM Students;
 DELETE FROM Grades;
 DELETE FROM Grids;
@@ -21,7 +22,7 @@ DELETE FROM UserCredentials;
 DELETE FROM Users;
 
 -- Reseta os auto-incrementos
-DELETE FROM sqlite_sequence WHERE name IN ('Users', 'UserCredentials', 'Grids', 'Grades', 'Classes', 'GradeClasses', 'ClassTeachers', 'Students', 'StudentGrades', 'Attendances', 'Activities', 'StudentActivities');
+DELETE FROM sqlite_sequence WHERE name IN ('Users', 'UserCredentials', 'Grids', 'Grades', 'Classes', 'GridGrades', 'GridClasses', 'ClassTeachers', 'Students', 'StudentGrades', 'Attendances', 'Activities', 'StudentActivities');
 
 -- Reabilita verificação de FK
 PRAGMA foreign_keys = ON;

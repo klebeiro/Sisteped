@@ -11,6 +11,6 @@ namespace SistepedApi.Services.Interfaces
         Task<GridResponseDTO?> UpdateAsync(int id, GridUpdateDTO dto);
         Task<bool> DeleteAsync(int id);
         Task<bool> AddGradeToGridAsync(GridGradeDTO dto);
-        Task<bool> RemoveGradeFromGridAsync(int gradeId);
+        Task<bool> RemoveGradeFromGridAsync(int gridId, int gradeId);
     }
 }

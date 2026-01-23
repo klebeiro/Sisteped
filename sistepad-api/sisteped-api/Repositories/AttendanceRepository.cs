@@ -18,7 +18,7 @@ namespace SistepedApi.Repositories
         {
             return await _context.Attendances
                 .Include(a => a.Student)
-                .Include(a => a.Grade)
+                .Include(a => a.Class)
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 
@@ -26,7 +26,7 @@ namespace SistepedApi.Repositories
         {
             return await _context.Attendances
                 .Include(a => a.Student)
-                .Include(a => a.Grade)
+                .Include(a => a.Class)
                 .ToListAsync();
         }
 
@@ -34,18 +34,18 @@ namespace SistepedApi.Repositories
         {
             return await _context.Attendances
                 .Include(a => a.Student)
-                .Include(a => a.Grade)
+                .Include(a => a.Class)
                 .Where(a => a.StudentId == studentId)
                 .OrderByDescending(a => a.Date)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Attendance>> GetByGradeIdAsync(int gradeId)
+        public async Task<IEnumerable<Attendance>> GetByClassIdAsync(int classId)
         {
             return await _context.Attendances
                 .Include(a => a.Student)
-                .Include(a => a.Grade)
-                .Where(a => a.GradeId == gradeId)
+                .Include(a => a.Class)
+                .Where(a => a.ClassId == classId)
                 .OrderByDescending(a => a.Date)
                 .ToListAsync();
         }
@@ -54,26 +54,26 @@ namespace SistepedApi.Repositories
         {
             return await _context.Attendances
                 .Include(a => a.Student)
-                .Include(a => a.Grade)
+                .Include(a => a.Class)
                 .Where(a => a.Date.Date == date.Date)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Attendance>> GetByGradeAndDateAsync(int gradeId, DateTime date)
+        public async Task<IEnumerable<Attendance>> GetByClassAndDateAsync(int classId, DateTime date)
         {
             return await _context.Attendances
                 .Include(a => a.Student)
-                .Include(a => a.Grade)
-                .Where(a => a.GradeId == gradeId && a.Date.Date == date.Date)
+                .Include(a => a.Class)
+                .Where(a => a.ClassId == classId && a.Date.Date == date.Date)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Attendance>> GetByStudentAndGradeAsync(int studentId, int gradeId)
+        public async Task<IEnumerable<Attendance>> GetByStudentAndClassAsync(int studentId, int classId)
         {
             return await _context.Attendances
                 .Include(a => a.Student)
-                .Include(a => a.Grade)
-                .Where(a => a.StudentId == studentId && a.GradeId == gradeId)
+                .Include(a => a.Class)
+                .Where(a => a.StudentId == studentId && a.ClassId == classId)
                 .OrderByDescending(a => a.Date)
                 .ToListAsync();
         }
@@ -123,10 +123,10 @@ namespace SistepedApi.Repositories
             return true;
         }
 
-        public async Task<bool> ExistsAsync(int studentId, int gradeId, DateTime date)
+        public async Task<bool> ExistsAsync(int studentId, int classId, DateTime date)
         {
             return await _context.Attendances
-                .AnyAsync(a => a.StudentId == studentId && a.GradeId == gradeId && a.Date.Date == date.Date);
+                .AnyAsync(a => a.StudentId == studentId && a.ClassId == classId && a.Date.Date == date.Date);
         }
     }
 }

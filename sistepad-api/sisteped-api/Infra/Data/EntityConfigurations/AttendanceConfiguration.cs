@@ -22,12 +22,12 @@ namespace SistepedApi.Infra.Data.EntityConfigurations
                 .HasForeignKey(a => a.StudentId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(a => a.Grade)
-                .WithMany()
-                .HasForeignKey(a => a.GradeId)
+            builder.HasOne(a => a.Class)
+                .WithMany(c => c.Attendances)
+                .HasForeignKey(a => a.ClassId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasIndex(a => new { a.StudentId, a.GradeId, a.Date })
+            builder.HasIndex(a => new { a.StudentId, a.ClassId, a.Date })
                 .IsUnique();
         }
     }

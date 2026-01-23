@@ -226,15 +226,15 @@ DELETE /api/Seed
 | GET | `/teachers` | Listar professores | CoordinatorOnly |
 | GET | `/guardians` | Listar responsáveis | CoordinatorOrTeacher |
 
-### GradeController (`/api/Grade`) - Séries/Turmas
+### GradeController (`/api/Grade`) - Turmas
 
 | Método | Rota | Descrição | Autorização |
 |--------|------|-----------|-------------|
-| GET | `/` | Listar todas as séries | CoordinatorOrTeacher |
-| GET | `/{id}` | Obter série por ID | CoordinatorOrTeacher |
-| POST | `/` | Criar série | CoordinatorOnly |
-| PUT | `/{id}` | Atualizar série | CoordinatorOnly |
-| DELETE | `/{id}` | Excluir série | CoordinatorOnly |
+| GET | `/` | Listar todas as turmas | CoordinatorOrTeacher |
+| GET | `/{id}` | Obter turma por ID | CoordinatorOrTeacher |
+| POST | `/` | Criar turma | CoordinatorOnly |
+| PUT | `/{id}` | Atualizar turma | CoordinatorOnly |
+| DELETE | `/{id}` | Excluir turma | CoordinatorOnly |
 
 ### ClassController (`/api/Class`) - Matérias
 
@@ -265,10 +265,10 @@ DELETE /api/Seed
 | GET | `/` | Listar todas as frequências | CoordinatorOrTeacher |
 | GET | `/{id}` | Obter frequência por ID | CoordinatorOrTeacher |
 | GET | `/by-student/{studentId}` | Frequências por aluno | Autenticado (com validação) |
-| GET | `/by-grade/{gradeId}` | Frequências por série | CoordinatorOrTeacher |
+| GET | `/by-class/{classId}` | Frequências por matéria | CoordinatorOrTeacher |
 | GET | `/by-date/{date}` | Frequências por data | CoordinatorOrTeacher |
-| GET | `/by-grade-and-date/{gradeId}/{date}` | Por série e data | CoordinatorOrTeacher |
-| GET | `/by-student-and-grade/{studentId}/{gradeId}` | Por aluno e série | Autenticado (com validação) |
+| GET | `/by-class-and-date/{classId}/{date}` | Por matéria e data | CoordinatorOrTeacher |
+| GET | `/by-student-and-class/{studentId}/{classId}` | Por aluno e matéria | Autenticado (com validação) |
 | POST | `/` | Registrar frequência | CoordinatorOrTeacher |
 | POST | `/bulk` | Registrar em lote | CoordinatorOrTeacher |
 | DELETE | `/{id}` | Excluir frequência | CoordinatorOnly |
@@ -277,24 +277,61 @@ DELETE /api/Seed
 
 | Método | Rota | Descrição | Autorização |
 |--------|------|-----------|-------------|
-| GET | `/` | Listar todas as grades | CoordinatorOrTeacher |
-| GET | `/{id}` | Obter grade por ID | CoordinatorOrTeacher |
-| POST | `/` | Criar grade | CoordinatorOnly |
-| PUT | `/{id}` | Atualizar grade | CoordinatorOnly |
-| DELETE | `/{id}` | Excluir grade | CoordinatorOnly |
-| POST | `/add-grade` | Adicionar série à grade | CoordinatorOnly |
-| POST | `/remove-grade/{gradeId}` | Remover série da grade | CoordinatorOnly |
+| GET | `/` | Listar todas as grades curriculares | CoordinatorOrTeacher |
+| GET | `/{id}` | Obter grade curricular por ID | CoordinatorOrTeacher |
+| POST | `/` | Criar grade curricular | CoordinatorOnly |
+| PUT | `/{id}` | Atualizar grade curricular | CoordinatorOnly |
+| DELETE | `/{id}` | Excluir grade curricular | CoordinatorOnly |
+| POST | `/add-grade` | Adicionar turma à grade curricular | CoordinatorOnly |
+| POST | `/remove-grade` | Remover turma da grade curricular | CoordinatorOnly |
 
-### GradeClassController (`/api/GradeClass`) - Série x Matéria
+### GridGradeController (`/api/GridGrade`) - Grade Curricular x Turma
 
 | Método | Rota | Descrição | Autorização |
 |--------|------|-----------|-------------|
 | GET | `/` | Listar todos | CoordinatorOrTeacher |
 | GET | `/{id}` | Obter por ID | CoordinatorOrTeacher |
-| GET | `/by-grade/{gradeId}` | Por série | CoordinatorOrTeacher |
-| GET | `/by-class/{classId}` | Por matéria | CoordinatorOrTeacher |
-| POST | `/` | Criar relacionamento | CoordinatorOnly |
-| DELETE | `/{id}` | Excluir relacionamento | CoordinatorOnly |
+| GET | `/by-grid/{gridId}` | Turmas de uma grade curricular | CoordinatorOrTeacher |
+| GET | `/by-grade/{gradeId}` | Grades curriculares de uma turma | CoordinatorOrTeacher |
+| POST | `/` | Vincular turma à grade curricular | CoordinatorOnly |
+| DELETE | `/{id}` | Desvincular turma da grade curricular | CoordinatorOnly |
+
+### GridClassController (`/api/GridClass`) - Grade Curricular x Matéria
+
+| Método | Rota | Descrição | Autorização |
+|--------|------|-----------|-------------|
+| GET | `/` | Listar todos | CoordinatorOrTeacher |
+| GET | `/{id}` | Obter por ID | CoordinatorOrTeacher |
+| GET | `/by-grid/{gridId}` | Matérias de uma grade curricular | CoordinatorOrTeacher |
+| GET | `/by-class/{classId}` | Grades curriculares de uma matéria | CoordinatorOrTeacher |
+| POST | `/` | Vincular matéria à grade curricular | CoordinatorOnly |
+| DELETE | `/{id}` | Desvincular matéria da grade curricular | CoordinatorOnly |
+
+### ActivityController (`/api/Activity`) - Atividades
+
+| Método | Rota | Descrição | Autorização |
+|--------|------|-----------|-------------|
+| GET | `/` | Listar todas as atividades | AllAuthenticated |
+| GET | `/{id}` | Obter atividade por ID | AllAuthenticated |
+| GET | `/by-class/{classId}` | Atividades por matéria | AllAuthenticated |
+| GET | `/by-date-range` | Atividades por período | AllAuthenticated |
+| POST | `/` | Criar atividade | CoordinatorOrTeacher |
+| PUT | `/{id}` | Atualizar atividade | CoordinatorOrTeacher |
+| DELETE | `/{id}` | Excluir atividade | CoordinatorOnly |
+
+### StudentActivityController (`/api/StudentActivity`) - Notas
+
+| Método | Rota | Descrição | Autorização |
+|--------|------|-----------|-------------|
+| GET | `/` | Listar todas as notas | CoordinatorOrTeacher |
+| GET | `/{id}` | Obter nota por ID | AllAuthenticated (com validação) |
+| GET | `/by-student/{studentId}` | Notas por aluno | AllAuthenticated (com validação) |
+| GET | `/by-activity/{activityId}` | Notas por atividade | CoordinatorOrTeacher |
+| GET | `/my-students` | Notas dos dependentes | Guardian |
+| POST | `/` | Lançar nota | CoordinatorOrTeacher |
+| POST | `/bulk` | Lançar notas em lote | CoordinatorOrTeacher |
+| PUT | `/{id}` | Atualizar nota | CoordinatorOrTeacher |
+| DELETE | `/{id}` | Excluir nota | CoordinatorOnly |
 
 ### ClassTeacherController (`/api/ClassTeacher`) - Matéria x Professor
 
@@ -308,25 +345,37 @@ DELETE /api/Seed
 | POST | `/` | Criar atribuição | CoordinatorOnly |
 | DELETE | `/{id}` | Excluir atribuição | CoordinatorOnly |
 
-### StudentGradeController (`/api/StudentGrade`) - Aluno x Série
+### StudentGridController (`/api/StudentGrid`) - Aluno x Grade Curricular
 
 | Método | Rota | Descrição | Autorização |
 |--------|------|-----------|-------------|
 | GET | `/` | Listar todos | CoordinatorOrTeacher |
 | GET | `/{id}` | Obter por ID | CoordinatorOrTeacher |
-| GET | `/by-student/{studentId}` | Por aluno | Autenticado (com validação) |
-| GET | `/by-grade/{gradeId}` | Por série | CoordinatorOrTeacher |
-| POST | `/` | Matricular aluno | CoordinatorOnly |
-| DELETE | `/{id}` | Cancelar matrícula | CoordinatorOnly |
+| GET | `/by-student/{studentId}` | Grades curriculares do aluno | Autenticado (com validação) |
+| GET | `/by-grid/{gridId}` | Alunos da grade curricular | CoordinatorOrTeacher |
+| POST | `/` | Vincular aluno à grade curricular | CoordinatorOnly |
+| DELETE | `/{id}` | Desvincular aluno da grade curricular | CoordinatorOnly |
 
 ### ReportController (`/api/Report`) - Relatórios
+
+#### Relatórios de Frequência
 
 | Método | Rota | Descrição | Autorização |
 |--------|------|-----------|-------------|
 | POST | `/attendance` | Relatório de frequência | Autenticado (com filtros) |
 | POST | `/attendance/by-student` | Resumo por aluno | CoordinatorOrTeacher |
-| POST | `/attendance/by-grade` | Resumo por série | CoordinatorOrTeacher |
+| POST | `/attendance/by-grade` | Resumo por turma | CoordinatorOrTeacher |
 | POST | `/attendance/my-students` | Frequência dos dependentes | Guardian |
+
+#### Relatórios de Notas
+
+| Método | Rota | Descrição | Autorização |
+|--------|------|-----------|-------------|
+| POST | `/grades` | Relatório de notas | Autenticado (com filtros) |
+| POST | `/grades/by-student` | Resumo por aluno | CoordinatorOrTeacher |
+| POST | `/grades/by-activity` | Resumo por atividade | CoordinatorOrTeacher |
+| POST | `/grades/by-grade` | Resumo por turma | CoordinatorOrTeacher |
+| POST | `/grades/my-students` | Notas dos dependentes | Guardian |
 
 ### SeedController (`/api/Seed`) - Dados de Teste
 
@@ -339,6 +388,8 @@ DELETE /api/Seed
 
 ## Modelagem de Dados
 
+> 📖 **Documentação Completa**: Veja [Estrutura e Fluxo do Sistema](docs/estrutura_sistema.md) para entender detalhadamente como o sistema funciona.
+
 ### Diagrama de Relacionamento
 
 ![Diagrama de Classes](docs/imagens/Diagram%20de%20Classes%20-%20Sisteped.png)
@@ -349,14 +400,16 @@ DELETE /api/Seed
 |----------|-----------|
 | **User** | Usuários do sistema (Coordenador, Professor, Responsável) |
 | **UserCredential** | Credenciais de autenticação |
-| **Grid** | Grade curricular (agrupa séries por ano) |
-| **Grade** | Série/Turma (1º Ano A, 2º Ano B, etc.) |
+| **Grid** | Grade curricular (estrutura curricular que agrupa turmas) |
+| **Grade** | Turma (1º Ano A, 2º Ano B, etc.) - pertence a um Grid |
 | **Class** | Matéria/Disciplina (Matemática, Português, etc.) |
 | **Student** | Alunos |
+| **Activity** | Atividade/Avaliação (vinculada a uma Class) |
 | **Attendance** | Registros de frequência |
-| **GradeClass** | Relacionamento N:N entre Série e Matéria |
+| **GridClass** | Relacionamento N:N entre Grade Curricular e Matéria |
 | **ClassTeacher** | Relacionamento N:N entre Matéria e Professor |
-| **StudentGrade** | Relacionamento N:N entre Aluno e Série |
+| **StudentGrid** | Relacionamento N:N entre Aluno e Grade Curricular |
+| **StudentActivity** | Relacionamento N:N entre Aluno e Atividade (com nota) |
 
 ### Relacionamentos
 
@@ -365,17 +418,39 @@ User (1) ────── (1) UserCredential
 User (1) ────── (N) Student (como Guardian)
 User (1) ────── (N) ClassTeacher (como Teacher)
 
-Grid (1) ────── (N) Grade
+Grid (1) ────── (N) GridGrade (Grade Curricular tem Turmas - N:N)
+Grid (1) ────── (N) GridClass (Grade Curricular tem Matérias)
+Grid (1) ────── (N) StudentGrid (Alunos vinculados à Grade Curricular)
 
-Grade (1) ────── (N) GradeClass
-Grade (1) ────── (N) StudentGrade
-Grade (1) ────── (N) Attendance
+Grade (1) ────── (N) GridGrade (Turma pode estar em várias Grades Curriculares - N:N)
 
-Class (1) ────── (N) GradeClass
-Class (1) ────── (N) ClassTeacher
+Class (1) ────── (N) GridClass (Matéria em várias Grades Curriculares)
+Class (1) ────── (N) ClassTeacher (Matéria tem Professores)
+Class (1) ────── (N) Activity (Matéria tem Atividades)
+Class (1) ────── (N) Attendance (Frequência é por Matéria)
 
-Student (1) ────── (N) StudentGrade
-Student (1) ────── (N) Attendance
+Activity (1) ────── (N) StudentActivity (Atividade tem Notas)
+
+Student (1) ────── (N) StudentGrid (Aluno em várias Grades Curriculares)
+Student (1) ────── (N) Attendance (Frequência do aluno por matéria)
+Student (1) ────── (N) StudentActivity (Notas do aluno)
+```
+
+### Hierarquia de Organização
+
+```
+GRID (Grade Curricular)
+  ├── GRID_GRADES (Turmas vinculadas - N:N)
+  │   └── GRADE (Turma)
+  ├── GRID_CLASSES (Matérias da Grade Curricular)
+  │   └── CLASS (Matéria)
+  │       ├── CLASS_TEACHERS (Professores)
+  │       ├── ACTIVITIES (Atividades)
+  │       └── ATTENDANCES (Frequências)
+  └── STUDENT_GRIDS (Alunos vinculados ao Grid)
+      └── STUDENT
+          ├── STUDENT_ACTIVITIES (Notas)
+          └── ATTENDANCES (Frequências por matéria)
 ```
 
 ---

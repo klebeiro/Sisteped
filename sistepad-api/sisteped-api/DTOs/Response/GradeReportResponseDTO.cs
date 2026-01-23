@@ -29,6 +29,11 @@ namespace SistepedApi.DTOs.Response
         public DateTime ApplicationDate { get; set; }
         public decimal MaxScore { get; set; }
         
+        // Class Info
+        public int ClassId { get; set; }
+        public string ClassName { get; set; } = string.Empty;
+        public string ClassCode { get; set; } = string.Empty;
+        
         // Grade Info
         public int GradeId { get; set; }
         public string GradeName { get; set; } = string.Empty;
@@ -69,8 +74,9 @@ namespace SistepedApi.DTOs.Response
         public string ActivityTitle { get; set; } = string.Empty;
         public DateTime ApplicationDate { get; set; }
         public decimal MaxScore { get; set; }
-        public int GradeId { get; set; }
-        public string GradeName { get; set; } = string.Empty;
+        public int ClassId { get; set; }
+        public string ClassName { get; set; } = string.Empty;
+        public string ClassCode { get; set; } = string.Empty;
         public int TotalStudents { get; set; }
         public int GradedStudents { get; set; }
         public int PendingStudents { get; set; }

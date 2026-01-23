@@ -11,18 +11,18 @@ namespace SistepedApi.Services
     {
         private readonly IAttendanceRepository _attendanceRepository;
         private readonly IStudentRepository _studentRepository;
-        private readonly IGradeRepository _gradeRepository;
+        private readonly IClassRepository _classRepository;
         private readonly IMapper _mapper;
 
         public AttendanceService(
             IAttendanceRepository attendanceRepository,
             IStudentRepository studentRepository,
-            IGradeRepository gradeRepository,
+            IClassRepository classRepository,
             IMapper mapper)
         {
             _attendanceRepository = attendanceRepository;
             _studentRepository = studentRepository;
-            _gradeRepository = gradeRepository;
+            _classRepository = classRepository;
             _mapper = mapper;
         }
 
@@ -44,9 +44,9 @@ namespace SistepedApi.Services
             return _mapper.Map<IEnumerable<AttendanceResponseDTO>>(attendances);
         }
 
-        public async Task<IEnumerable<AttendanceResponseDTO>> GetByGradeIdAsync(int gradeId)
+        public async Task<IEnumerable<AttendanceResponseDTO>> GetByClassIdAsync(int classId)
         {
-            var attendances = await _attendanceRepository.GetByGradeIdAsync(gradeId);
+            var attendances = await _attendanceRepository.GetByClassIdAsync(classId);
             return _mapper.Map<IEnumerable<AttendanceResponseDTO>>(attendances);
         }
 
@@ -56,15 +56,15 @@ namespace SistepedApi.Services
             return _mapper.Map<IEnumerable<AttendanceResponseDTO>>(attendances);
         }
 
-        public async Task<IEnumerable<AttendanceResponseDTO>> GetByGradeAndDateAsync(int gradeId, DateTime date)
+        public async Task<IEnumerable<AttendanceResponseDTO>> GetByClassAndDateAsync(int classId, DateTime date)
         {
-            var attendances = await _attendanceRepository.GetByGradeAndDateAsync(gradeId, date);
+            var attendances = await _attendanceRepository.GetByClassAndDateAsync(classId, date);
             return _mapper.Map<IEnumerable<AttendanceResponseDTO>>(attendances);
         }
 
-        public async Task<IEnumerable<AttendanceResponseDTO>> GetByStudentAndGradeAsync(int studentId, int gradeId)
+        public async Task<IEnumerable<AttendanceResponseDTO>> GetByStudentAndClassAsync(int studentId, int classId)
         {
-            var attendances = await _attendanceRepository.GetByStudentAndGradeAsync(studentId, gradeId);
+            var attendances = await _attendanceRepository.GetByStudentAndClassAsync(studentId, classId);
             return _mapper.Map<IEnumerable<AttendanceResponseDTO>>(attendances);
         }
 
@@ -75,20 +75,20 @@ namespace SistepedApi.Services
                 throw new Exception("Aluno não encontrado.");
             }
 
-            if (!await _gradeRepository.ExistsAsync(dto.GradeId))
+            if (!await _classRepository.ExistsAsync(dto.ClassId))
             {
-                throw new Exception("Série não encontrada.");
+                throw new Exception("Matéria não encontrada.");
             }
 
-            if (await _attendanceRepository.ExistsAsync(dto.StudentId, dto.GradeId, dto.Date))
+            if (await _attendanceRepository.ExistsAsync(dto.StudentId, dto.ClassId, dto.Date))
             {
-                throw new Exception("Já existe registro de frequência para este aluno nesta data.");
+                throw new Exception("Já existe registro de frequência para este aluno nesta matéria e data.");
             }
 
             var attendance = new Attendance
             {
                 StudentId = dto.StudentId,
-                GradeId = dto.GradeId,
+                ClassId = dto.ClassId,
                 Date = dto.Date,
                 Present = dto.Present
             };
@@ -99,9 +99,9 @@ namespace SistepedApi.Services
 
         public async Task<IEnumerable<AttendanceResponseDTO>> CreateBulkAsync(AttendanceBulkCreateDTO dto)
         {
-            if (!await _gradeRepository.ExistsAsync(dto.GradeId))
+            if (!await _classRepository.ExistsAsync(dto.ClassId))
             {
-                throw new Exception("Série não encontrada.");
+                throw new Exception("Matéria não encontrada.");
             }
 
             // Validar todos os alunos de uma vez
@@ -125,8 +125,8 @@ namespace SistepedApi.Services
 
             foreach (var studentAttendance in dto.Students)
             {
-                // Verifica se já existe registro para este aluno nesta data
-                if (await _attendanceRepository.ExistsAsync(studentAttendance.StudentId, dto.GradeId, dto.Date))
+                // Verifica se já existe registro para este aluno nesta matéria e data
+                if (await _attendanceRepository.ExistsAsync(studentAttendance.StudentId, dto.ClassId, dto.Date))
                 {
                     continue;
                 }
@@ -134,7 +134,7 @@ namespace SistepedApi.Services
                 attendances.Add(new Attendance
                 {
                     StudentId = studentAttendance.StudentId,
-                    GradeId = dto.GradeId,
+                    ClassId = dto.ClassId,
                     Date = dto.Date,
                     Present = studentAttendance.Present
                 });

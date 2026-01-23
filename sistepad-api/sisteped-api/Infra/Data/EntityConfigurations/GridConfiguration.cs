@@ -23,11 +23,6 @@ namespace SistepedApi.Infra.Data.EntityConfigurations
 
             builder.HasIndex(g => new { g.Year, g.Name })
                 .IsUnique();
-
-            builder.HasMany(g => g.Grades)
-                .WithOne(gr => gr.Grid)
-                .HasForeignKey(gr => gr.GridId)
-                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

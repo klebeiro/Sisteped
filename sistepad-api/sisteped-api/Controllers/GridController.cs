@@ -158,19 +158,23 @@ namespace SistepedApi.Controllers
         }
 
         /// <summary>
-        /// Remove uma série de uma grade. Apenas Coordenadores.
+        /// Remove uma turma de uma grade curricular. Apenas Coordenadores.
         /// </summary>
-        [HttpPost("remove-grade/{gradeId}")]
+        [HttpPost("remove-grade")]
         // [Authorize(Policy = "CoordinatorOnly")] // COMENTADO PARA TESTES
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Forbidden)]
-        public async Task<IActionResult> RemoveGradeFromGrid(int gradeId)
+        public async Task<IActionResult> RemoveGradeFromGrid([FromBody] GridGradeDTO dto)
         {
+            var validation = await _gradeValidator.ValidateAsync(dto);
+            if (!validation.IsValid)
+                return BadRequest(validation.Errors);
+
             try
             {
-                var result = await _gridService.RemoveGradeFromGridAsync(gradeId);
-                if (!result) return BadRequest("Não foi possível remover a série da grade.");
+                var result = await _gridService.RemoveGradeFromGridAsync(dto.GridId, dto.GradeId);
+                if (!result) return BadRequest("Não foi possível remover a turma da grade curricular.");
                 return Ok();
             }
             catch (Exception ex)

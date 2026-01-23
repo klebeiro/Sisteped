@@ -10,7 +10,9 @@ namespace SistepedApi.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
 
-        public ICollection<GradeClass> GradeClasses { get; set; } = new List<GradeClass>();
+        public ICollection<GridClass> GridClasses { get; set; } = new List<GridClass>();
         public ICollection<ClassTeacher> ClassTeachers { get; set; } = new List<ClassTeacher>();
+        public ICollection<Activity> Activities { get; set; } = new List<Activity>();
+        public ICollection<Attendance> Attendances { get; set; } = new List<Attendance>();
     }
 }

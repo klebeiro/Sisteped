@@ -14,6 +14,6 @@ namespace SistepedApi.Repositories.Interfaces
         Task<bool> ExistsAsync(int id);
         Task<bool> ExistsAsync(int year, string name);
         Task<bool> AddGradeToGridAsync(int gridId, int gradeId);
-        Task<bool> RemoveGradeFromGridAsync(int gradeId);
+        Task<bool> RemoveGradeFromGridAsync(int gridId, int gradeId);
     }
 }

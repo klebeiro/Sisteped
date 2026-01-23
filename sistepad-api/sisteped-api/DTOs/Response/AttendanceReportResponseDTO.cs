@@ -20,19 +20,12 @@ namespace SistepedApi.DTOs.Response
         public string StudentName { get; set; } = string.Empty;
         public string Enrollment { get; set; } = string.Empty;
         
-        // Grade Info
-        public int GradeId { get; set; }
-        public string GradeName { get; set; } = string.Empty;
-        public int Shift { get; set; }
-        public string ShiftName => Shift switch
-        {
-            1 => "Manhã",
-            2 => "Tarde",
-            3 => "Noite",
-            _ => "Não definido"
-        };
+        // Class Info
+        public int ClassId { get; set; }
+        public string ClassName { get; set; } = string.Empty;
+        public string ClassCode { get; set; } = string.Empty;
         
-        // Grid Info
+        // Grid Info (através do aluno vinculado ao Grid)
         public int? GridId { get; set; }
         public string? GridName { get; set; }
         

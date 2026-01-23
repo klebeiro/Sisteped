@@ -1,8 +1,8 @@
 namespace SistepedApi.DTOs.Request
 {
-    public class GradeClassDTO
+    public class GridClassDTO
     {
-        public int GradeId { get; set; }
+        public int GridId { get; set; }
         public int ClassId { get; set; }
     }
 }

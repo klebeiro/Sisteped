@@ -1,13 +1,13 @@
 namespace SistepedApi.Models
 {
-    public class GradeClass
+    public class GridClass
     {
         public int Id { get; set; }
-        public int GradeId { get; set; }
+        public int GridId { get; set; }
         public int ClassId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public Grade Grade { get; set; } = null!;
+        public Grid Grid { get; set; } = null!;
         public Class Class { get; set; } = null!;
     }
 }

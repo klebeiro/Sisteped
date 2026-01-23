@@ -10,8 +10,8 @@ namespace SistepedApi.Validators.Attendance
             RuleFor(x => x.StudentId)
                 .GreaterThan(0).WithMessage("O ID do aluno é obrigatório.");
 
-            RuleFor(x => x.GradeId)
-                .GreaterThan(0).WithMessage("O ID da série é obrigatório.");
+            RuleFor(x => x.ClassId)
+                .GreaterThan(0).WithMessage("O ID da matéria é obrigatório.");
 
             RuleFor(x => x.Date)
                 .NotEmpty().WithMessage("A data é obrigatória.");

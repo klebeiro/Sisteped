@@ -17,8 +17,9 @@ namespace SistepedApi.Repositories
         public async Task<Activity?> GetByIdAsync(int id)
         {
             return await _context.Activities
-                .Include(a => a.Grade)
-                    .ThenInclude(g => g.Grid)
+                .Include(a => a.Class)
+                    .ThenInclude(c => c.GridClasses)
+                        .ThenInclude(gc => gc.Grid)
                 .Include(a => a.StudentActivities)
                     .ThenInclude(sa => sa.Student)
                 .FirstOrDefaultAsync(a => a.Id == id);
@@ -27,18 +28,18 @@ namespace SistepedApi.Repositories
         public async Task<IEnumerable<Activity>> GetAllAsync()
         {
             return await _context.Activities
-                .Include(a => a.Grade)
+                .Include(a => a.Class)
                 .Include(a => a.StudentActivities)
                 .OrderByDescending(a => a.ApplicationDate)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Activity>> GetByGradeIdAsync(int gradeId)
+        public async Task<IEnumerable<Activity>> GetByClassIdAsync(int classId)
         {
             return await _context.Activities
-                .Include(a => a.Grade)
+                .Include(a => a.Class)
                 .Include(a => a.StudentActivities)
-                .Where(a => a.GradeId == gradeId)
+                .Where(a => a.ClassId == classId)
                 .OrderByDescending(a => a.ApplicationDate)
                 .ToListAsync();
         }
@@ -46,7 +47,7 @@ namespace SistepedApi.Repositories
         public async Task<IEnumerable<Activity>> GetByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
             return await _context.Activities
-                .Include(a => a.Grade)
+                .Include(a => a.Class)
                 .Include(a => a.StudentActivities)
                 .Where(a => a.ApplicationDate >= startDate && a.ApplicationDate <= endDate)
                 .OrderByDescending(a => a.ApplicationDate)

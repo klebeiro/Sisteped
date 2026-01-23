@@ -20,7 +20,7 @@ namespace SistepedApi.Repositories
                 .Include(sa => sa.Student)
                     .ThenInclude(s => s.Guardian)
                 .Include(sa => sa.Activity)
-                    .ThenInclude(a => a.Grade)
+                    .ThenInclude(a => a.Class)
                 .FirstOrDefaultAsync(sa => sa.Id == id);
         }
 
@@ -29,7 +29,7 @@ namespace SistepedApi.Repositories
             return await _context.StudentActivities
                 .Include(sa => sa.Student)
                 .Include(sa => sa.Activity)
-                    .ThenInclude(a => a.Grade)
+                    .ThenInclude(a => a.Class)
                 .OrderByDescending(sa => sa.Activity.ApplicationDate)
                 .ToListAsync();
         }
@@ -39,7 +39,7 @@ namespace SistepedApi.Repositories
             return await _context.StudentActivities
                 .Include(sa => sa.Student)
                 .Include(sa => sa.Activity)
-                    .ThenInclude(a => a.Grade)
+                    .ThenInclude(a => a.Class)
                 .Where(sa => sa.StudentId == studentId)
                 .OrderByDescending(sa => sa.Activity.ApplicationDate)
                 .ToListAsync();
@@ -50,7 +50,7 @@ namespace SistepedApi.Repositories
             return await _context.StudentActivities
                 .Include(sa => sa.Student)
                 .Include(sa => sa.Activity)
-                    .ThenInclude(a => a.Grade)
+                    .ThenInclude(a => a.Class)
                 .Where(sa => sa.ActivityId == activityId)
                 .OrderBy(sa => sa.Student.Name)
                 .ToListAsync();
@@ -61,7 +61,7 @@ namespace SistepedApi.Repositories
             return await _context.StudentActivities
                 .Include(sa => sa.Student)
                 .Include(sa => sa.Activity)
-                    .ThenInclude(a => a.Grade)
+                    .ThenInclude(a => a.Class)
                 .FirstOrDefaultAsync(sa => sa.StudentId == studentId && sa.ActivityId == activityId);
         }
 

@@ -29,12 +29,12 @@ namespace SistepedApi.Infra.Data.EntityConfigurations
                 .IsRequired()
                 .HasDefaultValue(true);
 
-            builder.HasOne(a => a.Grade)
-                .WithMany(g => g.Activities)
-                .HasForeignKey(a => a.GradeId)
+            builder.HasOne(a => a.Class)
+                .WithMany(c => c.Activities)
+                .HasForeignKey(a => a.ClassId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasIndex(a => a.GradeId);
+            builder.HasIndex(a => a.ClassId);
             builder.HasIndex(a => a.ApplicationDate);
         }
     }

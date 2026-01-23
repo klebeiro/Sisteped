@@ -5,8 +5,9 @@ namespace SistepedApi.DTOs.Response
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
-        public int GradeId { get; set; }
-        public string GradeName { get; set; } = string.Empty;
+        public int ClassId { get; set; }
+        public string ClassName { get; set; } = string.Empty;
+        public string ClassCode { get; set; } = string.Empty;
         public DateTime ApplicationDate { get; set; }
         public decimal MaxScore { get; set; }
         public bool Status { get; set; }

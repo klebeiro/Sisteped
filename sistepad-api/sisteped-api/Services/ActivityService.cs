@@ -10,16 +10,16 @@ namespace SistepedApi.Services
     public class ActivityService : IActivityService
     {
         private readonly IActivityRepository _activityRepository;
-        private readonly IGradeRepository _gradeRepository;
+        private readonly IClassRepository _classRepository;
         private readonly IMapper _mapper;
 
         public ActivityService(
             IActivityRepository activityRepository,
-            IGradeRepository gradeRepository,
+            IClassRepository classRepository,
             IMapper mapper)
         {
             _activityRepository = activityRepository;
-            _gradeRepository = gradeRepository;
+            _classRepository = classRepository;
             _mapper = mapper;
         }
 
@@ -35,9 +35,9 @@ namespace SistepedApi.Services
             return _mapper.Map<IEnumerable<ActivityResponseDTO>>(activities);
         }
 
-        public async Task<IEnumerable<ActivityResponseDTO>> GetByGradeIdAsync(int gradeId)
+        public async Task<IEnumerable<ActivityResponseDTO>> GetByClassIdAsync(int classId)
         {
-            var activities = await _activityRepository.GetByGradeIdAsync(gradeId);
+            var activities = await _activityRepository.GetByClassIdAsync(classId);
             return _mapper.Map<IEnumerable<ActivityResponseDTO>>(activities);
         }
 
@@ -49,9 +49,9 @@ namespace SistepedApi.Services
 
         public async Task<ActivityResponseDTO> CreateAsync(ActivityCreateDTO dto)
         {
-            if (!await _gradeRepository.ExistsAsync(dto.GradeId))
+            if (!await _classRepository.ExistsAsync(dto.ClassId))
             {
-                throw new Exception("Série não encontrada.");
+                throw new Exception("Matéria não encontrada.");
             }
 
             if (dto.MaxScore <= 0)
@@ -63,7 +63,7 @@ namespace SistepedApi.Services
             {
                 Title = dto.Title,
                 Description = dto.Description,
-                GradeId = dto.GradeId,
+                ClassId = dto.ClassId,
                 ApplicationDate = dto.ApplicationDate,
                 MaxScore = dto.MaxScore
             };

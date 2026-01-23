@@ -2,7 +2,7 @@ namespace SistepedApi.DTOs.Request
 {
     public class AttendanceBulkCreateDTO
     {
-        public int GradeId { get; set; }
+        public int ClassId { get; set; }
         public DateTime Date { get; set; }
         public List<StudentAttendanceDTO> Students { get; set; } = new List<StudentAttendanceDTO>();
     }

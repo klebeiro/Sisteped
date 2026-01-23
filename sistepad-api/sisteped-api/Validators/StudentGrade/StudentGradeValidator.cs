@@ -11,7 +11,7 @@ namespace SistepedApi.Validators.StudentGrade
                 .GreaterThan(0).WithMessage("O ID do aluno é obrigatório.");
 
             RuleFor(x => x.GradeId)
-                .GreaterThan(0).WithMessage("O ID da série é obrigatório.");
+                .GreaterThan(0).WithMessage("O ID da turma é obrigatório.");
         }
     }
 }

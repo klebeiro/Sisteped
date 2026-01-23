@@ -93,15 +93,15 @@ namespace SistepedApi.Controllers
         }
 
         /// <summary>
-        /// Obtém frequências por série. Apenas Coordenadores e Professores.
+        /// Obtém frequências por matéria. Apenas Coordenadores e Professores.
         /// </summary>
-        [HttpGet("by-grade/{gradeId}")]
+        [HttpGet("by-class/{classId}")]
         // [Authorize(Policy = "CoordinatorOrTeacher")] // COMENTADO PARA TESTES
         [ProducesResponseType(typeof(IEnumerable<AttendanceResponseDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Forbidden)]
-        public async Task<ActionResult<IEnumerable<AttendanceResponseDTO>>> GetByGradeId(int gradeId)
+        public async Task<ActionResult<IEnumerable<AttendanceResponseDTO>>> GetByClassId(int classId)
         {
-            var attendances = await _attendanceService.GetByGradeIdAsync(gradeId);
+            var attendances = await _attendanceService.GetByClassIdAsync(classId);
             return Ok(attendances);
         }
 
@@ -119,27 +119,27 @@ namespace SistepedApi.Controllers
         }
 
         /// <summary>
-        /// Obtém frequências por série e data. Apenas Coordenadores e Professores.
+        /// Obtém frequências por matéria e data. Apenas Coordenadores e Professores.
         /// </summary>
-        [HttpGet("by-grade-and-date/{gradeId}/{date}")]
+        [HttpGet("by-class-and-date/{classId}/{date}")]
         // [Authorize(Policy = "CoordinatorOrTeacher")] // COMENTADO PARA TESTES
         [ProducesResponseType(typeof(IEnumerable<AttendanceResponseDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Forbidden)]
-        public async Task<ActionResult<IEnumerable<AttendanceResponseDTO>>> GetByGradeAndDate(int gradeId, DateTime date)
+        public async Task<ActionResult<IEnumerable<AttendanceResponseDTO>>> GetByClassAndDate(int classId, DateTime date)
         {
-            var attendances = await _attendanceService.GetByGradeAndDateAsync(gradeId, date);
+            var attendances = await _attendanceService.GetByClassAndDateAsync(classId, date);
             return Ok(attendances);
         }
 
         /// <summary>
-        /// Obtém frequências por aluno e série.
+        /// Obtém frequências por aluno e matéria.
         /// Coordenadores e Professores podem consultar qualquer aluno.
         /// Responsáveis só podem consultar seus dependentes.
         /// </summary>
-        [HttpGet("by-student-and-grade/{studentId}/{gradeId}")]
+        [HttpGet("by-student-and-class/{studentId}/{classId}")]
         [ProducesResponseType(typeof(IEnumerable<AttendanceResponseDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Forbidden)]
-        public async Task<ActionResult<IEnumerable<AttendanceResponseDTO>>> GetByStudentAndGrade(int studentId, int gradeId)
+        public async Task<ActionResult<IEnumerable<AttendanceResponseDTO>>> GetByStudentAndClass(int studentId, int classId)
         {
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
@@ -152,7 +152,7 @@ namespace SistepedApi.Controllers
                     return Forbid();
             }
 
-            var attendances = await _attendanceService.GetByStudentAndGradeAsync(studentId, gradeId);
+            var attendances = await _attendanceService.GetByStudentAndClassAsync(studentId, classId);
             return Ok(attendances);
         }
 

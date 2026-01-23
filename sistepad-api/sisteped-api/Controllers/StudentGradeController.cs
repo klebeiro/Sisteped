@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SistepedApi.DTOs.Request;
 using SistepedApi.DTOs.Response;
-using SistepedApi.Models.Enums;
 using SistepedApi.Services.Interfaces;
 using System.Net;
 using System.Security.Claims;
@@ -11,10 +10,10 @@ using System.Security.Claims;
 namespace SistepedApi.Controllers
 {
     /// <summary>
-    /// Controller responsável pelo relacionamento entre alunos e séries.
+    /// Controller responsável pelo relacionamento entre alunos e turmas.
     /// Coordenadores: CRUD completo.
     /// Professores: Apenas leitura.
-    /// Responsáveis: Apenas visualização dos próprios dependentes.
+    /// Responsáveis: Podem ver apenas seus dependentes.
     /// </summary>
     [ApiController]
     // [Authorize] // COMENTADO PARA TESTES
@@ -37,7 +36,7 @@ namespace SistepedApi.Controllers
         }
 
         /// <summary>
-        /// Obtém um relacionamento aluno-série pelo ID. Acessível por Coordenadores e Professores.
+        /// Obtém um relacionamento aluno-turma pelo ID. Acessível por Coordenadores e Professores.
         /// </summary>
         [HttpGet("{id}")]
         // [Authorize(Policy = "CoordinatorOrTeacher")] // COMENTADO PARA TESTES
@@ -52,7 +51,7 @@ namespace SistepedApi.Controllers
         }
 
         /// <summary>
-        /// Obtém todos os relacionamentos aluno-série. Acessível por Coordenadores e Professores.
+        /// Obtém todos os relacionamentos aluno-turma. Acessível por Coordenadores e Professores.
         /// </summary>
         [HttpGet]
         // [Authorize(Policy = "CoordinatorOrTeacher")] // COMENTADO PARA TESTES
@@ -74,23 +73,24 @@ namespace SistepedApi.Controllers
         [ProducesResponseType((int)HttpStatusCode.Forbidden)]
         public async Task<ActionResult<IEnumerable<StudentGradeResponseDTO>>> GetByStudentId(int studentId)
         {
-            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-            var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
-
-            // Responsáveis só podem consultar seus dependentes
-            if (currentUserRole == nameof(UserRole.Guardian))
-            {
-                var student = await _studentService.GetByIdAsync(studentId);
-                if (student == null || student.GuardianId != currentUserId)
-                    return Forbid();
-            }
+            // TODO: Descomentar quando reativar autenticação
+            // var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            // var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
+            // 
+            // // Responsáveis só podem consultar seus dependentes
+            // if (currentUserRole == nameof(UserRole.Guardian))
+            // {
+            //     var student = await _studentService.GetByIdAsync(studentId);
+            //     if (student == null || student.GuardianId != currentUserId)
+            //         return Forbid();
+            // }
 
             var studentGrades = await _studentGradeService.GetByStudentIdAsync(studentId);
             return Ok(studentGrades);
         }
 
         /// <summary>
-        /// Obtém relacionamentos por série. Acessível por Coordenadores e Professores.
+        /// Obtém relacionamentos por turma. Acessível por Coordenadores e Professores.
         /// </summary>
         [HttpGet("by-grade/{gradeId}")]
         // [Authorize(Policy = "CoordinatorOrTeacher")] // COMENTADO PARA TESTES
@@ -103,7 +103,7 @@ namespace SistepedApi.Controllers
         }
 
         /// <summary>
-        /// Cria um relacionamento aluno-série. Apenas Coordenadores.
+        /// Cria um relacionamento aluno-turma. Apenas Coordenadores.
         /// </summary>
         [HttpPost]
         // [Authorize(Policy = "CoordinatorOnly")] // COMENTADO PARA TESTES
@@ -128,7 +128,7 @@ namespace SistepedApi.Controllers
         }
 
         /// <summary>
-        /// Exclui um relacionamento aluno-série. Apenas Coordenadores.
+        /// Exclui um relacionamento aluno-turma. Apenas Coordenadores.
         /// </summary>
         [HttpDelete("{id}")]
         // [Authorize(Policy = "CoordinatorOnly")] // COMENTADO PARA TESTES

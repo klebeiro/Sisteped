@@ -59,12 +59,12 @@ namespace SistepedApi.Services
 
             if (!await _gradeRepository.ExistsAsync(dto.GradeId))
             {
-                throw new Exception("Série não encontrada.");
+                throw new Exception("Turma não encontrada.");
             }
 
             if (await _studentGradeRepository.ExistsAsync(dto.StudentId, dto.GradeId))
             {
-                throw new Exception("Este aluno já está matriculado nesta série.");
+                throw new Exception("Este aluno já está vinculado a esta turma.");
             }
 
             var studentGrade = new StudentGrade

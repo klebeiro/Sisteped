@@ -29,21 +29,30 @@ namespace SistepedApi.Services
                 TotalPresent = totalPresent,
                 TotalAbsent = totalAbsent,
                 AttendancePercentage = totalRecords > 0 ? Math.Round((double)totalPresent / totalRecords * 100, 2) : 0,
-                Items = attendanceList.Select(a => new AttendanceReportItemDTO
+                Items = attendanceList.Select(a => 
                 {
-                    AttendanceId = a.Id,
-                    Date = a.Date,
-                    Present = a.Present,
-                    StudentId = a.StudentId,
-                    StudentName = a.Student.Name,
-                    Enrollment = a.Student.Enrollment,
-                    GradeId = a.GradeId,
-                    GradeName = a.Grade.Name,
-                    Shift = a.Grade.Shift,
-                    GridId = a.Grade.GridId,
-                    GridName = a.Grade.Grid?.Name,
-                    GuardianId = a.Student.GuardianId,
-                    GuardianName = a.Student.Guardian.Name
+                    // Obter a turma do aluno (primeira turma encontrada)
+                    var studentGrade = a.Student.StudentGrades.FirstOrDefault();
+                    var grade = studentGrade?.Grade;
+                    // Obter o Grid da turma (primeiro Grid encontrado)
+                    var grid = grade?.GridGrades.FirstOrDefault()?.Grid;
+                    
+                    return new AttendanceReportItemDTO
+                    {
+                        AttendanceId = a.Id,
+                        Date = a.Date,
+                        Present = a.Present,
+                        StudentId = a.StudentId,
+                        StudentName = a.Student.Name,
+                        Enrollment = a.Student.Enrollment,
+                        ClassId = a.ClassId,
+                        ClassName = a.Class.Name,
+                        ClassCode = a.Class.Code,
+                        GridId = grid?.Id,
+                        GridName = grid?.Name,
+                        GuardianId = a.Student.GuardianId,
+                        GuardianName = a.Student.Guardian.Name
+                    };
                 })
             };
         }
@@ -78,13 +87,14 @@ namespace SistepedApi.Services
             var attendances = await _reportRepository.GetFilteredAttendancesAsync(filter);
             var attendanceList = attendances.ToList();
 
-            var groupedByGrade = attendanceList
-                .GroupBy(a => new { a.GradeId, a.Grade.Name, a.Grade.Shift })
+            // Agrupar por matéria (Class) ao invés de Grade
+            var groupedByClass = attendanceList
+                .GroupBy(a => new { a.ClassId, a.Class.Name, a.Class.Code })
                 .Select(g => new GradeAttendanceSummaryDTO
                 {
-                    GradeId = g.Key.GradeId,
-                    GradeName = g.Key.Name,
-                    Shift = g.Key.Shift,
+                    GradeId = g.Key.ClassId, // Usando ClassId como identificador
+                    GradeName = g.Key.Name, // Nome da matéria
+                    Shift = 0, // Não aplicável para matéria
                     TotalStudents = g.Select(a => a.StudentId).Distinct().Count(),
                     TotalRecords = g.Count(),
                     TotalPresent = g.Count(a => a.Present),
@@ -96,7 +106,7 @@ namespace SistepedApi.Services
                 .OrderByDescending(g => g.AttendancePercentage)
                 .ThenBy(g => g.GradeName);
 
-            return groupedByGrade;
+            return groupedByClass;
         }
 
         // Grade Reports
@@ -118,26 +128,38 @@ namespace SistepedApi.Services
                 AverageScore = gradedRecords.Any() ? Math.Round(gradedRecords.Average(sa => sa.Score!.Value), 2) : null,
                 HighestScore = gradedRecords.Any() ? gradedRecords.Max(sa => sa.Score) : null,
                 LowestScore = gradedRecords.Any() ? gradedRecords.Min(sa => sa.Score) : null,
-                Items = activityList.Select(sa => new GradeReportItemDTO
+                Items = activityList.Select(sa => 
                 {
-                    StudentActivityId = sa.Id,
-                    Score = sa.Score,
-                    Remarks = sa.Remarks,
-                    CreatedAt = sa.CreatedAt,
-                    StudentId = sa.StudentId,
-                    StudentName = sa.Student.Name,
-                    Enrollment = sa.Student.Enrollment,
-                    ActivityId = sa.ActivityId,
-                    ActivityTitle = sa.Activity.Title,
-                    ApplicationDate = sa.Activity.ApplicationDate,
-                    MaxScore = sa.Activity.MaxScore,
-                    GradeId = sa.Activity.GradeId,
-                    GradeName = sa.Activity.Grade.Name,
-                    Shift = sa.Activity.Grade.Shift,
-                    GridId = sa.Activity.Grade.GridId,
-                    GridName = sa.Activity.Grade.Grid?.Name,
-                    GuardianId = sa.Student.GuardianId,
-                    GuardianName = sa.Student.Guardian.Name
+                    // Obter a turma do aluno (primeira turma encontrada)
+                    var studentGrade = sa.Student.StudentGrades.FirstOrDefault();
+                    var grade = studentGrade?.Grade;
+                    // Obter o Grid da turma (primeiro Grid encontrado)
+                    var grid = grade?.GridGrades.FirstOrDefault()?.Grid;
+                    
+                    return new GradeReportItemDTO
+                    {
+                        StudentActivityId = sa.Id,
+                        Score = sa.Score,
+                        Remarks = sa.Remarks,
+                        CreatedAt = sa.CreatedAt,
+                        StudentId = sa.StudentId,
+                        StudentName = sa.Student.Name,
+                        Enrollment = sa.Student.Enrollment,
+                        ActivityId = sa.ActivityId,
+                        ActivityTitle = sa.Activity.Title,
+                        ApplicationDate = sa.Activity.ApplicationDate,
+                        MaxScore = sa.Activity.MaxScore,
+                        ClassId = sa.Activity.ClassId,
+                        ClassName = sa.Activity.Class.Name,
+                        ClassCode = sa.Activity.Class.Code,
+                        GradeId = grade?.Id ?? 0,
+                        GradeName = grade?.Name ?? string.Empty,
+                        Shift = grade?.Shift ?? 0,
+                        GridId = grid?.Id,
+                        GridName = grid?.Name,
+                        GuardianId = sa.Student.GuardianId,
+                        GuardianName = sa.Student.Guardian.Name
+                    };
                 })
             };
         }
@@ -177,7 +199,7 @@ namespace SistepedApi.Services
             var activityList = studentActivities.ToList();
 
             var groupedByActivity = activityList
-                .GroupBy(sa => new { sa.ActivityId, sa.Activity.Title, sa.Activity.ApplicationDate, sa.Activity.MaxScore, sa.Activity.GradeId, GradeName = sa.Activity.Grade.Name })
+                .GroupBy(sa => new { sa.ActivityId, sa.Activity.Title, sa.Activity.ApplicationDate, sa.Activity.MaxScore, sa.Activity.ClassId, ClassName = sa.Activity.Class.Name, ClassCode = sa.Activity.Class.Code })
                 .Select(g => 
                 {
                     var gradedItems = g.Where(sa => sa.Score.HasValue).ToList();
@@ -187,8 +209,9 @@ namespace SistepedApi.Services
                         ActivityTitle = g.Key.Title,
                         ApplicationDate = g.Key.ApplicationDate,
                         MaxScore = g.Key.MaxScore,
-                        GradeId = g.Key.GradeId,
-                        GradeName = g.Key.GradeName,
+                        ClassId = g.Key.ClassId,
+                        ClassName = g.Key.ClassName,
+                        ClassCode = g.Key.ClassCode,
                         TotalStudents = g.Count(),
                         GradedStudents = gradedItems.Count,
                         PendingStudents = g.Count() - gradedItems.Count,
@@ -208,21 +231,24 @@ namespace SistepedApi.Services
             var studentActivities = await _reportRepository.GetFilteredGradesAsync(filter);
             var activityList = studentActivities.ToList();
 
+            // Agrupar por série através das turmas dos alunos
             var groupedByGrade = activityList
-                .GroupBy(sa => new { sa.Activity.GradeId, sa.Activity.Grade.Name, sa.Activity.Grade.Shift })
+                .SelectMany(sa => sa.Student.StudentGrades
+                    .Select(sg => new { StudentActivity = sa, Grade = sg.Grade }))
+                .GroupBy(x => new { GradeId = x.Grade.Id, GradeName = x.Grade.Name, Shift = x.Grade.Shift })
                 .Select(g => 
                 {
-                    var gradedItems = g.Where(sa => sa.Score.HasValue).ToList();
+                    var gradedItems = g.Where(x => x.StudentActivity.Score.HasValue).ToList();
                     return new GradeGradeSummaryDTO
                     {
                         GradeId = g.Key.GradeId,
-                        GradeName = g.Key.Name,
+                        GradeName = g.Key.GradeName,
                         Shift = g.Key.Shift,
-                        TotalActivities = g.Select(sa => sa.ActivityId).Distinct().Count(),
-                        TotalStudents = g.Select(sa => sa.StudentId).Distinct().Count(),
-                        AverageScore = gradedItems.Any() ? Math.Round(gradedItems.Average(sa => sa.Score!.Value), 2) : null,
-                        HighestScore = gradedItems.Any() ? gradedItems.Max(sa => sa.Score) : null,
-                        LowestScore = gradedItems.Any() ? gradedItems.Min(sa => sa.Score) : null
+                        TotalActivities = g.Select(x => x.StudentActivity.ActivityId).Distinct().Count(),
+                        TotalStudents = g.Select(x => x.StudentActivity.StudentId).Distinct().Count(),
+                        AverageScore = gradedItems.Any() ? Math.Round(gradedItems.Average(x => x.StudentActivity.Score!.Value), 2) : null,
+                        HighestScore = gradedItems.Any() ? gradedItems.Max(x => x.StudentActivity.Score) : null,
+                        LowestScore = gradedItems.Any() ? gradedItems.Min(x => x.StudentActivity.Score) : null
                     };
                 })
                 .OrderByDescending(g => g.AverageScore ?? 0)

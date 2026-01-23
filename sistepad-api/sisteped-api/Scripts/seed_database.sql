@@ -15,7 +15,8 @@ DELETE FROM Activities;
 DELETE FROM Attendances;
 DELETE FROM StudentGrades;
 DELETE FROM ClassTeachers;
-DELETE FROM GradeClasses;
+DELETE FROM GridClasses;
+DELETE FROM GridGrades;
 DELETE FROM Students;
 DELETE FROM Grades;
 DELETE FROM Grids;
@@ -24,7 +25,7 @@ DELETE FROM UserCredentials;
 DELETE FROM Users;
 
 -- Reseta os auto-incrementos
-DELETE FROM sqlite_sequence WHERE name IN ('Users', 'UserCredentials', 'Grids', 'Grades', 'Classes', 'GradeClasses', 'ClassTeachers', 'Students', 'StudentGrades', 'Attendances', 'Activities', 'StudentActivities');
+DELETE FROM sqlite_sequence WHERE name IN ('Users', 'UserCredentials', 'Grids', 'Grades', 'Classes', 'GridGrades', 'GridClasses', 'ClassTeachers', 'Students', 'StudentGrades', 'Attendances', 'Activities', 'StudentActivities');
 
 -- Reabilita verificação de FK
 PRAGMA foreign_keys = ON;
@@ -88,12 +89,25 @@ INSERT INTO Grids (Id, Year, Name, Status, CreatedAt) VALUES
 -- GRADES (Séries/Turmas)
 -- Shift: 1 = Manhã, 2 = Tarde, 3 = Noite
 -- =====================================================
-INSERT INTO Grades (Id, Name, Level, Shift, Status, GridId, CreatedAt) VALUES 
-(1, '1º Ano A', 1, 1, 1, 1, datetime('now')),  -- Manhã, Grid 2025
-(2, '1º Ano B', 1, 2, 1, 1, datetime('now')),  -- Tarde, Grid 2025
-(3, '2º Ano A', 2, 1, 1, 1, datetime('now')),  -- Manhã, Grid 2025
-(4, '3º Ano A', 3, 3, 1, 2, datetime('now')),  -- Noite, Grid 2026
-(5, '2º Ano B', 2, 2, 1, 1, datetime('now'));  -- Tarde, Grid 2025
+INSERT INTO Grades (Id, Name, Level, Shift, Status, CreatedAt) VALUES 
+(1, '1º Ano A', 1, 1, 1, datetime('now')),  -- Manhã
+(2, '1º Ano B', 1, 2, 1, datetime('now')),  -- Tarde
+(3, '2º Ano A', 2, 1, 1, datetime('now')),  -- Manhã
+(4, '3º Ano A', 3, 3, 1, datetime('now')),  -- Noite
+(5, '2º Ano B', 2, 2, 1, datetime('now'));  -- Tarde
+
+-- =====================================================
+-- GRID_GRADES (Relacionamento Grade Curricular x Turma)
+-- =====================================================
+INSERT INTO GridGrades (Id, GridId, GradeId, CreatedAt) VALUES 
+-- Grade Curricular 2025 (Grid 1) tem as turmas 1, 2, 3, 5
+(1, 1, 1, datetime('now')),  -- Grid 2025 -> 1º Ano A
+(2, 1, 2, datetime('now')),  -- Grid 2025 -> 1º Ano B
+(3, 1, 3, datetime('now')),  -- Grid 2025 -> 2º Ano A
+(4, 1, 5, datetime('now')),  -- Grid 2025 -> 2º Ano B
+
+-- Grade Curricular 2026 (Grid 2) tem a turma 4
+(5, 2, 4, datetime('now'));  -- Grid 2026 -> 3º Ano A
 
 -- =====================================================
 -- CLASSES (Matérias/Disciplinas)
@@ -108,36 +122,24 @@ INSERT INTO Classes (Id, Code, Name, WorkloadHours, Status, CreatedAt) VALUES
 (7, 'ART001', 'Artes', 30, 1, datetime('now'));
 
 -- =====================================================
--- GRADE_CLASSES (Relacionamento Série x Matéria)
+-- GRID_CLASSES (Relacionamento Grade Curricular x Matéria)
+-- Grid 2025 (Id=1) tem todas as matérias básicas
+-- Grid 2026 (Id=2) tem matérias mais avançadas
 -- =====================================================
-INSERT INTO GradeClasses (Id, GradeId, ClassId, CreatedAt) VALUES 
--- 1º Ano A (Série 1)
+INSERT INTO GridClasses (Id, GridId, ClassId, CreatedAt) VALUES 
+-- Grade Curricular 2025 (Grid 1) - Ensino Fundamental I
 (1, 1, 1, datetime('now')),   -- Matemática
 (2, 1, 2, datetime('now')),   -- Português
 (3, 1, 3, datetime('now')),   -- Ciências
-(4, 1, 7, datetime('now')),   -- Artes
+(4, 1, 4, datetime('now')),   -- História
+(5, 1, 5, datetime('now')),   -- Geografia
+(6, 1, 7, datetime('now')),   -- Artes
 
--- 1º Ano B (Série 2)
-(5, 2, 1, datetime('now')),   -- Matemática
-(6, 2, 2, datetime('now')),   -- Português
-(7, 2, 3, datetime('now')),   -- Ciências
-
--- 2º Ano A (Série 3)
-(8, 3, 1, datetime('now')),   -- Matemática
-(9, 3, 2, datetime('now')),   -- Português
-(10, 3, 4, datetime('now')),  -- História
-(11, 3, 5, datetime('now')),  -- Geografia
-
--- 3º Ano A (Série 4)
-(12, 4, 1, datetime('now')),  -- Matemática
-(13, 4, 2, datetime('now')),  -- Português
-(14, 4, 5, datetime('now')),  -- Geografia
-(15, 4, 6, datetime('now')),  -- Inglês
-
--- 2º Ano B (Série 5)
-(16, 5, 1, datetime('now')),  -- Matemática
-(17, 5, 2, datetime('now')),  -- Português
-(18, 5, 4, datetime('now'));  -- História
+-- Grade Curricular 2026 (Grid 2) - Ensino Fundamental II
+(7, 2, 1, datetime('now')),   -- Matemática
+(8, 2, 2, datetime('now')),   -- Português
+(9, 2, 5, datetime('now')),   -- Geografia
+(10, 2, 6, datetime('now'));  -- Inglês
 
 -- =====================================================
 -- CLASS_TEACHERS (Relacionamento Matéria x Professor)
@@ -170,161 +172,161 @@ INSERT INTO Students (Id, Enrollment, Name, BirthDate, GuardianId, Status, Creat
 (8, '2025008', 'Julia Ferreira', '2015-06-25', 5, 1, datetime('now'));
 
 -- =====================================================
--- STUDENT_GRADES (Relacionamento Aluno x Série)
+-- STUDENT_GRADES (Relacionamento Aluno x Turma)
+-- Alunos são vinculados às Turmas (Grades), que por sua vez estão vinculadas aos Grids
 -- =====================================================
 INSERT INTO StudentGrades (Id, StudentId, GradeId, CreatedAt) VALUES 
--- 1º Ano A (Série 1): Pedro, Laura, Beatriz
+-- Turma 1º Ano A (Grade 1): Pedro, Laura, Gabriel
 (1, 1, 1, datetime('now')),  -- Pedro -> 1º Ano A
 (2, 2, 1, datetime('now')),  -- Laura -> 1º Ano A
-(3, 6, 1, datetime('now')),  -- Beatriz -> 1º Ano A
+(3, 3, 1, datetime('now')),  -- Gabriel -> 1º Ano A
 
--- 1º Ano B (Série 2): Gabriel
-(4, 3, 2, datetime('now')),  -- Gabriel -> 1º Ano B
+-- Turma 1º Ano B (Grade 2): Beatriz, Sofia, Miguel, Julia
+(4, 6, 2, datetime('now')),  -- Beatriz -> 1º Ano B
+(5, 4, 2, datetime('now')),  -- Sofia -> 1º Ano B
+(6, 7, 2, datetime('now')),  -- Miguel -> 1º Ano B
+(7, 8, 2, datetime('now')),  -- Julia -> 1º Ano B
 
--- 2º Ano A (Série 3): Sofia, Miguel
-(5, 4, 3, datetime('now')),  -- Sofia -> 2º Ano A
-(6, 7, 3, datetime('now')),  -- Miguel -> 2º Ano A
-
--- 3º Ano A (Série 4): Lucas
-(7, 5, 4, datetime('now')),  -- Lucas -> 3º Ano A
-
--- 2º Ano B (Série 5): Julia
-(8, 8, 5, datetime('now'));  -- Julia -> 2º Ano B
+-- Turma 3º Ano A (Grade 4): Lucas
+(8, 5, 4, datetime('now'));  -- Lucas -> 3º Ano A
 
 -- =====================================================
 -- ATTENDANCES (Frequência)
 -- Gerando registros para os últimos 15 dias úteis
 -- =====================================================
 
--- Pedro (Aluno 1) - 1º Ano A (Série 1) - Excelente frequência
-INSERT INTO Attendances (StudentId, GradeId, Date, Present, CreatedAt) VALUES 
-(1, 1, date('now', '-1 day'), 1, datetime('now')),
-(1, 1, date('now', '-2 day'), 1, datetime('now')),
-(1, 1, date('now', '-3 day'), 1, datetime('now')),
-(1, 1, date('now', '-4 day'), 1, datetime('now')),
-(1, 1, date('now', '-7 day'), 1, datetime('now')),
-(1, 1, date('now', '-8 day'), 1, datetime('now')),
-(1, 1, date('now', '-9 day'), 1, datetime('now')),
-(1, 1, date('now', '-10 day'), 1, datetime('now')),
-(1, 1, date('now', '-11 day'), 1, datetime('now')),
-(1, 1, date('now', '-14 day'), 1, datetime('now'));
+-- Pedro (Aluno 1) - Grid 2025 - Excelente frequência em Matemática (Class 1)
+INSERT INTO Attendances (StudentId, ClassId, Date, Present, CreatedAt) VALUES 
+(1, 1, date('now', '-1 day'), 1, datetime('now')),  -- Matemática
+(1, 1, date('now', '-2 day'), 1, datetime('now')),  -- Matemática
+(1, 1, date('now', '-3 day'), 1, datetime('now')),  -- Matemática
+(1, 1, date('now', '-4 day'), 1, datetime('now')),  -- Matemática
+(1, 1, date('now', '-7 day'), 1, datetime('now')),  -- Matemática
+(1, 2, date('now', '-1 day'), 1, datetime('now')),  -- Português
+(1, 2, date('now', '-2 day'), 1, datetime('now')),  -- Português
+(1, 2, date('now', '-3 day'), 1, datetime('now')),  -- Português
+(1, 3, date('now', '-1 day'), 1, datetime('now')),  -- Ciências
+(1, 3, date('now', '-2 day'), 1, datetime('now'));  -- Ciências
 
--- Laura (Aluno 2) - 1º Ano A (Série 1) - Boa frequência com algumas faltas
-INSERT INTO Attendances (StudentId, GradeId, Date, Present, CreatedAt) VALUES 
-(2, 1, date('now', '-1 day'), 1, datetime('now')),
-(2, 1, date('now', '-2 day'), 0, datetime('now')),  -- Falta
-(2, 1, date('now', '-3 day'), 1, datetime('now')),
-(2, 1, date('now', '-4 day'), 1, datetime('now')),
-(2, 1, date('now', '-7 day'), 1, datetime('now')),
-(2, 1, date('now', '-8 day'), 0, datetime('now')),  -- Falta
-(2, 1, date('now', '-9 day'), 1, datetime('now')),
-(2, 1, date('now', '-10 day'), 1, datetime('now')),
-(2, 1, date('now', '-11 day'), 1, datetime('now')),
-(2, 1, date('now', '-14 day'), 0, datetime('now')); -- Falta
+-- Laura (Aluno 2) - Grid 2025 - Boa frequência com algumas faltas
+INSERT INTO Attendances (StudentId, ClassId, Date, Present, CreatedAt) VALUES 
+(2, 1, date('now', '-1 day'), 1, datetime('now')),  -- Matemática
+(2, 1, date('now', '-2 day'), 0, datetime('now')),  -- Matemática - Falta
+(2, 1, date('now', '-3 day'), 1, datetime('now')),  -- Matemática
+(2, 2, date('now', '-1 day'), 1, datetime('now')),  -- Português
+(2, 2, date('now', '-2 day'), 0, datetime('now')),  -- Português - Falta
+(2, 2, date('now', '-3 day'), 1, datetime('now')),  -- Português
+(2, 3, date('now', '-1 day'), 1, datetime('now')),  -- Ciências
+(2, 3, date('now', '-2 day'), 0, datetime('now')),  -- Ciências - Falta
+(2, 3, date('now', '-3 day'), 1, datetime('now')),  -- Ciências
+(2, 7, date('now', '-1 day'), 1, datetime('now'));  -- Artes
 
--- Gabriel (Aluno 3) - 1º Ano B (Série 2) - Frequência média
-INSERT INTO Attendances (StudentId, GradeId, Date, Present, CreatedAt) VALUES 
-(3, 2, date('now', '-1 day'), 1, datetime('now')),
-(3, 2, date('now', '-2 day'), 1, datetime('now')),
-(3, 2, date('now', '-3 day'), 0, datetime('now')),  -- Falta
-(3, 2, date('now', '-4 day'), 1, datetime('now')),
-(3, 2, date('now', '-7 day'), 0, datetime('now')),  -- Falta
-(3, 2, date('now', '-8 day'), 1, datetime('now')),
-(3, 2, date('now', '-9 day'), 1, datetime('now')),
-(3, 2, date('now', '-10 day'), 0, datetime('now')), -- Falta
-(3, 2, date('now', '-11 day'), 1, datetime('now')),
-(3, 2, date('now', '-14 day'), 1, datetime('now'));
+-- Gabriel (Aluno 3) - Grid 2025 - Frequência média
+INSERT INTO Attendances (StudentId, ClassId, Date, Present, CreatedAt) VALUES 
+(3, 1, date('now', '-1 day'), 1, datetime('now')),  -- Matemática
+(3, 1, date('now', '-2 day'), 1, datetime('now')),  -- Matemática
+(3, 1, date('now', '-3 day'), 0, datetime('now')),  -- Matemática - Falta
+(3, 2, date('now', '-1 day'), 1, datetime('now')),  -- Português
+(3, 2, date('now', '-2 day'), 0, datetime('now')),  -- Português - Falta
+(3, 2, date('now', '-3 day'), 1, datetime('now')),  -- Português
+(3, 3, date('now', '-1 day'), 1, datetime('now')),  -- Ciências
+(3, 3, date('now', '-2 day'), 0, datetime('now')),  -- Ciências - Falta
+(3, 3, date('now', '-3 day'), 1, datetime('now')),  -- Ciências
+(3, 4, date('now', '-1 day'), 1, datetime('now'));  -- História
 
--- Sofia (Aluno 4) - 2º Ano A (Série 3) - Excelente frequência
-INSERT INTO Attendances (StudentId, GradeId, Date, Present, CreatedAt) VALUES 
-(4, 3, date('now', '-1 day'), 1, datetime('now')),
-(4, 3, date('now', '-2 day'), 1, datetime('now')),
-(4, 3, date('now', '-3 day'), 1, datetime('now')),
-(4, 3, date('now', '-4 day'), 1, datetime('now')),
-(4, 3, date('now', '-7 day'), 1, datetime('now')),
-(4, 3, date('now', '-8 day'), 1, datetime('now')),
-(4, 3, date('now', '-9 day'), 0, datetime('now')),  -- Falta
-(4, 3, date('now', '-10 day'), 1, datetime('now')),
-(4, 3, date('now', '-11 day'), 1, datetime('now')),
-(4, 3, date('now', '-14 day'), 1, datetime('now'));
+-- Sofia (Aluno 4) - Grid 2025 - Excelente frequência
+INSERT INTO Attendances (StudentId, ClassId, Date, Present, CreatedAt) VALUES 
+(4, 1, date('now', '-1 day'), 1, datetime('now')),  -- Matemática
+(4, 1, date('now', '-2 day'), 1, datetime('now')),  -- Matemática
+(4, 1, date('now', '-3 day'), 1, datetime('now')),  -- Matemática
+(4, 2, date('now', '-1 day'), 1, datetime('now')),  -- Português
+(4, 2, date('now', '-2 day'), 1, datetime('now')),  -- Português
+(4, 4, date('now', '-1 day'), 1, datetime('now')),  -- História
+(4, 4, date('now', '-2 day'), 1, datetime('now')),  -- História
+(4, 5, date('now', '-1 day'), 1, datetime('now')),  -- Geografia
+(4, 5, date('now', '-2 day'), 0, datetime('now')),  -- Geografia - Falta
+(4, 5, date('now', '-3 day'), 1, datetime('now'));  -- Geografia
 
--- Lucas (Aluno 5) - 3º Ano A (Série 4) - Frequência ruim
-INSERT INTO Attendances (StudentId, GradeId, Date, Present, CreatedAt) VALUES 
-(5, 4, date('now', '-1 day'), 0, datetime('now')),  -- Falta
-(5, 4, date('now', '-2 day'), 1, datetime('now')),
-(5, 4, date('now', '-3 day'), 0, datetime('now')),  -- Falta
-(5, 4, date('now', '-4 day'), 1, datetime('now')),
-(5, 4, date('now', '-7 day'), 0, datetime('now')),  -- Falta
-(5, 4, date('now', '-8 day'), 0, datetime('now')),  -- Falta
-(5, 4, date('now', '-9 day'), 1, datetime('now')),
-(5, 4, date('now', '-10 day'), 0, datetime('now')), -- Falta
-(5, 4, date('now', '-11 day'), 1, datetime('now')),
-(5, 4, date('now', '-14 day'), 0, datetime('now')); -- Falta
+-- Lucas (Aluno 5) - Grid 2026 - Frequência ruim
+INSERT INTO Attendances (StudentId, ClassId, Date, Present, CreatedAt) VALUES 
+(5, 1, date('now', '-1 day'), 0, datetime('now')),  -- Matemática - Falta
+(5, 1, date('now', '-2 day'), 1, datetime('now')),  -- Matemática
+(5, 1, date('now', '-3 day'), 0, datetime('now')),  -- Matemática - Falta
+(5, 2, date('now', '-1 day'), 1, datetime('now')),  -- Português
+(5, 2, date('now', '-2 day'), 0, datetime('now')),  -- Português - Falta
+(5, 5, date('now', '-1 day'), 0, datetime('now')),  -- Geografia - Falta
+(5, 5, date('now', '-2 day'), 1, datetime('now')),  -- Geografia
+(5, 6, date('now', '-1 day'), 1, datetime('now')),  -- Inglês
+(5, 6, date('now', '-2 day'), 0, datetime('now')),  -- Inglês - Falta
+(5, 6, date('now', '-3 day'), 1, datetime('now'));  -- Inglês
 
--- Beatriz (Aluno 6) - 1º Ano A (Série 1) - Boa frequência
-INSERT INTO Attendances (StudentId, GradeId, Date, Present, CreatedAt) VALUES 
-(6, 1, date('now', '-1 day'), 1, datetime('now')),
-(6, 1, date('now', '-2 day'), 1, datetime('now')),
-(6, 1, date('now', '-3 day'), 1, datetime('now')),
-(6, 1, date('now', '-4 day'), 0, datetime('now')),  -- Falta
-(6, 1, date('now', '-7 day'), 1, datetime('now')),
-(6, 1, date('now', '-8 day'), 1, datetime('now')),
-(6, 1, date('now', '-9 day'), 1, datetime('now')),
-(6, 1, date('now', '-10 day'), 1, datetime('now')),
-(6, 1, date('now', '-11 day'), 0, datetime('now')), -- Falta
-(6, 1, date('now', '-14 day'), 1, datetime('now'));
+-- Beatriz (Aluno 6) - Grid 2025 - Boa frequência
+INSERT INTO Attendances (StudentId, ClassId, Date, Present, CreatedAt) VALUES 
+(6, 1, date('now', '-1 day'), 1, datetime('now')),  -- Matemática
+(6, 1, date('now', '-2 day'), 1, datetime('now')),  -- Matemática
+(6, 1, date('now', '-3 day'), 1, datetime('now')),  -- Matemática
+(6, 2, date('now', '-1 day'), 1, datetime('now')),  -- Português
+(6, 2, date('now', '-2 day'), 0, datetime('now')),  -- Português - Falta
+(6, 2, date('now', '-3 day'), 1, datetime('now')),  -- Português
+(6, 3, date('now', '-1 day'), 1, datetime('now')),  -- Ciências
+(6, 3, date('now', '-2 day'), 1, datetime('now')),  -- Ciências
+(6, 7, date('now', '-1 day'), 1, datetime('now')),  -- Artes
+(6, 7, date('now', '-2 day'), 1, datetime('now'));  -- Artes
 
--- Miguel (Aluno 7) - 2º Ano A (Série 3) - Frequência média
-INSERT INTO Attendances (StudentId, GradeId, Date, Present, CreatedAt) VALUES 
-(7, 3, date('now', '-1 day'), 1, datetime('now')),
-(7, 3, date('now', '-2 day'), 0, datetime('now')),  -- Falta
-(7, 3, date('now', '-3 day'), 1, datetime('now')),
-(7, 3, date('now', '-4 day'), 1, datetime('now')),
-(7, 3, date('now', '-7 day'), 0, datetime('now')),  -- Falta
-(7, 3, date('now', '-8 day'), 1, datetime('now')),
-(7, 3, date('now', '-9 day'), 0, datetime('now')),  -- Falta
-(7, 3, date('now', '-10 day'), 1, datetime('now')),
-(7, 3, date('now', '-11 day'), 1, datetime('now')),
-(7, 3, date('now', '-14 day'), 1, datetime('now'));
+-- Miguel (Aluno 7) - Grid 2025 - Frequência média
+INSERT INTO Attendances (StudentId, ClassId, Date, Present, CreatedAt) VALUES 
+(7, 1, date('now', '-1 day'), 1, datetime('now')),  -- Matemática
+(7, 1, date('now', '-2 day'), 0, datetime('now')),  -- Matemática - Falta
+(7, 1, date('now', '-3 day'), 1, datetime('now')),  -- Matemática
+(7, 2, date('now', '-1 day'), 1, datetime('now')),  -- Português
+(7, 2, date('now', '-2 day'), 1, datetime('now')),  -- Português
+(7, 4, date('now', '-1 day'), 0, datetime('now')),  -- História - Falta
+(7, 4, date('now', '-2 day'), 1, datetime('now')),  -- História
+(7, 5, date('now', '-1 day'), 1, datetime('now')),  -- Geografia
+(7, 5, date('now', '-2 day'), 0, datetime('now')),  -- Geografia - Falta
+(7, 5, date('now', '-3 day'), 1, datetime('now'));  -- Geografia
 
--- Julia (Aluno 8) - 2º Ano B (Série 5) - Excelente frequência
-INSERT INTO Attendances (StudentId, GradeId, Date, Present, CreatedAt) VALUES 
-(8, 5, date('now', '-1 day'), 1, datetime('now')),
-(8, 5, date('now', '-2 day'), 1, datetime('now')),
-(8, 5, date('now', '-3 day'), 1, datetime('now')),
-(8, 5, date('now', '-4 day'), 1, datetime('now')),
-(8, 5, date('now', '-7 day'), 1, datetime('now')),
-(8, 5, date('now', '-8 day'), 1, datetime('now')),
-(8, 5, date('now', '-9 day'), 1, datetime('now')),
-(8, 5, date('now', '-10 day'), 1, datetime('now')),
-(8, 5, date('now', '-11 day'), 1, datetime('now')),
-(8, 5, date('now', '-14 day'), 0, datetime('now')); -- Falta
+-- Julia (Aluno 8) - Grid 2025 - Excelente frequência
+INSERT INTO Attendances (StudentId, ClassId, Date, Present, CreatedAt) VALUES 
+(8, 1, date('now', '-1 day'), 1, datetime('now')),  -- Matemática
+(8, 1, date('now', '-2 day'), 1, datetime('now')),  -- Matemática
+(8, 1, date('now', '-3 day'), 1, datetime('now')),  -- Matemática
+(8, 2, date('now', '-1 day'), 1, datetime('now')),  -- Português
+(8, 2, date('now', '-2 day'), 1, datetime('now')),  -- Português
+(8, 2, date('now', '-3 day'), 1, datetime('now')),  -- Português
+(8, 4, date('now', '-1 day'), 1, datetime('now')),  -- História
+(8, 4, date('now', '-2 day'), 1, datetime('now')),  -- História
+(8, 4, date('now', '-3 day'), 0, datetime('now')),  -- História - Falta
+(8, 5, date('now', '-1 day'), 1, datetime('now'));  -- Geografia
 
 -- =====================================================
 -- ACTIVITIES (Atividades)
+-- Classes: 1=Matemática, 2=Português, 3=Ciências, 4=História, 5=Geografia, 6=Inglês, 7=Artes
 -- =====================================================
-INSERT INTO Activities (Id, Title, Description, GradeId, ApplicationDate, MaxScore, Status, CreatedAt) VALUES 
--- Atividades para 1º Ano A (Série 1)
+INSERT INTO Activities (Id, Title, Description, ClassId, ApplicationDate, MaxScore, Status, CreatedAt) VALUES 
+-- Atividades de Matemática (Class 1)
 (1, 'Prova de Matemática - 1º Bimestre', 'Avaliação sobre números e operações básicas', 1, date('now', '-10 day'), 10, 1, datetime('now')),
-(2, 'Trabalho de Português - Leitura', 'Interpretação de texto e vocabulário', 1, date('now', '-7 day'), 10, 1, datetime('now')),
-(3, 'Exercícios de Ciências', 'Atividade sobre o corpo humano', 1, date('now', '-5 day'), 5, 1, datetime('now')),
+(4, 'Prova de Matemática - 1º Bimestre', 'Avaliação sobre números e operações básicas', 1, date('now', '-10 day'), 10, 1, datetime('now')),
+(6, 'Prova de Matemática - 1º Bimestre', 'Avaliação sobre multiplicação e divisão', 1, date('now', '-12 day'), 10, 1, datetime('now')),
+(9, 'Prova de Matemática - 1º Bimestre', 'Avaliação sobre frações', 1, date('now', '-14 day'), 10, 1, datetime('now')),
+(11, 'Prova de Matemática - 1º Bimestre', 'Avaliação sobre multiplicação', 1, date('now', '-11 day'), 10, 1, datetime('now')),
 
--- Atividades para 1º Ano B (Série 2)
-(4, 'Prova de Matemática - 1º Bimestre', 'Avaliação sobre números e operações básicas', 2, date('now', '-10 day'), 10, 1, datetime('now')),
+-- Atividades de Português (Class 2)
+(2, 'Trabalho de Português - Leitura', 'Interpretação de texto e vocabulário', 2, date('now', '-7 day'), 10, 1, datetime('now')),
 (5, 'Redação - Minha Família', 'Produção de texto sobre a família', 2, date('now', '-6 day'), 10, 1, datetime('now')),
+(12, 'Prova de Português', 'Avaliação de gramática', 2, date('now', '-5 day'), 10, 1, datetime('now')),
 
--- Atividades para 2º Ano A (Série 3)
-(6, 'Prova de Matemática - 1º Bimestre', 'Avaliação sobre multiplicação e divisão', 3, date('now', '-12 day'), 10, 1, datetime('now')),
-(7, 'Trabalho de História', 'Pesquisa sobre a cidade', 3, date('now', '-8 day'), 10, 1, datetime('now')),
-(8, 'Prova de Geografia', 'Avaliação sobre relevo brasileiro', 3, date('now', '-4 day'), 10, 1, datetime('now')),
+-- Atividades de Ciências (Class 3)
+(3, 'Exercícios de Ciências', 'Atividade sobre o corpo humano', 3, date('now', '-5 day'), 5, 1, datetime('now')),
 
--- Atividades para 3º Ano A (Série 4)
-(9, 'Prova de Matemática - 1º Bimestre', 'Avaliação sobre frações', 4, date('now', '-14 day'), 10, 1, datetime('now')),
-(10, 'Trabalho de Inglês', 'Apresentação oral em inglês', 4, date('now', '-7 day'), 10, 1, datetime('now')),
+-- Atividades de História (Class 4)
+(7, 'Trabalho de História', 'Pesquisa sobre a cidade', 4, date('now', '-8 day'), 10, 1, datetime('now')),
 
--- Atividades para 2º Ano B (Série 5)
-(11, 'Prova de Matemática - 1º Bimestre', 'Avaliação sobre multiplicação', 5, date('now', '-11 day'), 10, 1, datetime('now')),
-(12, 'Prova de Português', 'Avaliação de gramática', 5, date('now', '-5 day'), 10, 1, datetime('now'));
+-- Atividades de Geografia (Class 5)
+(8, 'Prova de Geografia', 'Avaliação sobre relevo brasileiro', 5, date('now', '-4 day'), 10, 1, datetime('now')),
+
+-- Atividades de Inglês (Class 6)
+(10, 'Trabalho de Inglês', 'Apresentação oral em inglês', 6, date('now', '-7 day'), 10, 1, datetime('now'));
 
 -- =====================================================
 -- STUDENT_ACTIVITIES (Notas dos Alunos)
@@ -421,10 +423,11 @@ SELECT 'Usuários: ' || COUNT(*) FROM Users;
 SELECT 'Grids: ' || COUNT(*) FROM Grids;
 SELECT 'Séries: ' || COUNT(*) FROM Grades;
 SELECT 'Matérias: ' || COUNT(*) FROM Classes;
-SELECT 'Série x Matéria: ' || COUNT(*) FROM GradeClasses;
+SELECT 'Grade Curricular x Turma: ' || COUNT(*) FROM GridGrades;
+SELECT 'Grade Curricular x Matéria: ' || COUNT(*) FROM GridClasses;
 SELECT 'Matéria x Professor: ' || COUNT(*) FROM ClassTeachers;
 SELECT 'Alunos: ' || COUNT(*) FROM Students;
-SELECT 'Aluno x Série: ' || COUNT(*) FROM StudentGrades;
+SELECT 'Aluno x Turma: ' || COUNT(*) FROM StudentGrades;
 SELECT 'Frequências: ' || COUNT(*) FROM Attendances;
 SELECT 'Atividades: ' || COUNT(*) FROM Activities;
 SELECT 'Notas: ' || COUNT(*) FROM StudentActivities;

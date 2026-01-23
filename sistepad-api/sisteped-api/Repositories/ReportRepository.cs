@@ -20,12 +20,16 @@ namespace SistepedApi.Repositories
             var query = _context.Attendances
                 .Include(a => a.Student)
                     .ThenInclude(s => s.Guardian)
-                .Include(a => a.Grade)
-                    .ThenInclude(g => g.Grid)
-                .Include(a => a.Grade)
-                    .ThenInclude(g => g.GradeClasses)
-                        .ThenInclude(gc => gc.Class)
-                            .ThenInclude(c => c.ClassTeachers)
+                .Include(a => a.Student)
+                    .ThenInclude(s => s.StudentGrades)
+                        .ThenInclude(sg => sg.Grade)
+                            .ThenInclude(g => g.GridGrades)
+                                .ThenInclude(gg => gg.Grid)
+                .Include(a => a.Class)
+                    .ThenInclude(c => c.ClassTeachers)
+                .Include(a => a.Class)
+                    .ThenInclude(c => c.GridClasses)
+                        .ThenInclude(gc => gc.Grid)
                 .AsQueryable();
 
             // Filtro por ID do aluno
@@ -40,37 +44,39 @@ namespace SistepedApi.Repositories
                 query = query.Where(a => a.Student.Enrollment.Contains(filter.Enrollment));
             }
 
-            // Filtro por professor (através das matérias da série)
+            // Filtro por professor (através das matérias)
             if (filter.TeacherId.HasValue)
             {
-                query = query.Where(a => a.Grade.GradeClasses
-                    .Any(gc => gc.Class.ClassTeachers
-                        .Any(ct => ct.TeacherId == filter.TeacherId.Value)));
+                query = query.Where(a => a.Class.ClassTeachers
+                    .Any(ct => ct.TeacherId == filter.TeacherId.Value));
             }
 
-            // Filtro por série
+            // Filtro por série (através dos alunos que pertencem a essa turma)
             if (filter.GradeId.HasValue)
             {
-                query = query.Where(a => a.GradeId == filter.GradeId.Value);
+                query = query.Where(a => a.Student.StudentGrades
+                    .Any(sg => sg.GradeId == filter.GradeId.Value));
             }
 
-            // Filtro por turno
+            // Filtro por turno (através dos alunos que pertencem a turmas com esse turno)
             if (filter.Shift.HasValue)
             {
-                query = query.Where(a => a.Grade.Shift == filter.Shift.Value);
+                query = query.Where(a => a.Student.StudentGrades
+                    .Any(sg => sg.Grade.Shift == filter.Shift.Value));
             }
 
-            // Filtro por grade/turma (Grid)
+            // Filtro por grade curricular (Grid) - através das turmas do aluno que estão vinculadas ao Grid
             if (filter.GridId.HasValue)
             {
-                query = query.Where(a => a.Grade.GridId == filter.GridId.Value);
+                query = query.Where(a => a.Student.StudentGrades
+                    .Any(sg => sg.Grade.GridGrades
+                        .Any(gg => gg.GridId == filter.GridId.Value)));
             }
 
             // Filtro por matéria
             if (filter.ClassId.HasValue)
             {
-                query = query.Where(a => a.Grade.GradeClasses
-                    .Any(gc => gc.ClassId == filter.ClassId.Value));
+                query = query.Where(a => a.ClassId == filter.ClassId.Value);
             }
 
             // Filtro por data inicial
@@ -102,14 +108,18 @@ namespace SistepedApi.Repositories
             var query = _context.StudentActivities
                 .Include(sa => sa.Student)
                     .ThenInclude(s => s.Guardian)
+                .Include(sa => sa.Student)
+                    .ThenInclude(s => s.StudentGrades)
+                        .ThenInclude(sg => sg.Grade)
+                            .ThenInclude(g => g.GridGrades)
+                                .ThenInclude(gg => gg.Grid)
                 .Include(sa => sa.Activity)
-                    .ThenInclude(a => a.Grade)
-                        .ThenInclude(g => g.Grid)
+                    .ThenInclude(a => a.Class)
+                        .ThenInclude(c => c.GridClasses)
+                            .ThenInclude(gc => gc.Grid)
                 .Include(sa => sa.Activity)
-                    .ThenInclude(a => a.Grade)
-                        .ThenInclude(g => g.GradeClasses)
-                            .ThenInclude(gc => gc.Class)
-                                .ThenInclude(c => c.ClassTeachers)
+                    .ThenInclude(a => a.Class)
+                        .ThenInclude(c => c.ClassTeachers)
                 .AsQueryable();
 
             // Filtro por ID do aluno
@@ -130,37 +140,39 @@ namespace SistepedApi.Repositories
                 query = query.Where(sa => sa.ActivityId == filter.ActivityId.Value);
             }
 
-            // Filtro por série
+            // Filtro por série (através dos alunos que pertencem a essa turma)
             if (filter.GradeId.HasValue)
             {
-                query = query.Where(sa => sa.Activity.GradeId == filter.GradeId.Value);
+                query = query.Where(sa => sa.Student.StudentGrades
+                    .Any(sg => sg.GradeId == filter.GradeId.Value));
             }
 
-            // Filtro por professor (através das matérias da série)
+            // Filtro por professor (através das matérias)
             if (filter.TeacherId.HasValue)
             {
-                query = query.Where(sa => sa.Activity.Grade.GradeClasses
-                    .Any(gc => gc.Class.ClassTeachers
-                        .Any(ct => ct.TeacherId == filter.TeacherId.Value)));
+                query = query.Where(sa => sa.Activity.Class.ClassTeachers
+                    .Any(ct => ct.TeacherId == filter.TeacherId.Value));
             }
 
-            // Filtro por turno
+            // Filtro por turno (através dos alunos que pertencem a turmas com esse turno)
             if (filter.Shift.HasValue)
             {
-                query = query.Where(sa => sa.Activity.Grade.Shift == filter.Shift.Value);
+                query = query.Where(sa => sa.Student.StudentGrades
+                    .Any(sg => sg.Grade.Shift == filter.Shift.Value));
             }
 
-            // Filtro por grade/turma (Grid)
+            // Filtro por grade curricular (Grid) - através das turmas do aluno que estão vinculadas ao Grid
             if (filter.GridId.HasValue)
             {
-                query = query.Where(sa => sa.Activity.Grade.GridId == filter.GridId.Value);
+                query = query.Where(sa => sa.Student.StudentGrades
+                    .Any(sg => sg.Grade.GridGrades
+                        .Any(gg => gg.GridId == filter.GridId.Value)));
             }
 
             // Filtro por matéria
             if (filter.ClassId.HasValue)
             {
-                query = query.Where(sa => sa.Activity.Grade.GradeClasses
-                    .Any(gc => gc.ClassId == filter.ClassId.Value));
+                query = query.Where(sa => sa.Activity.ClassId == filter.ClassId.Value);
             }
 
             // Filtro por data inicial

@@ -61,14 +61,14 @@ namespace SistepedApi.Controllers
         }
 
         /// <summary>
-        /// Obtém atividades por série.
+        /// Obtém atividades por matéria.
         /// </summary>
-        [HttpGet("by-grade/{gradeId}")]
+        [HttpGet("by-class/{classId}")]
         // [Authorize(Policy = "AllAuthenticated")] // COMENTADO PARA TESTES
         [ProducesResponseType(typeof(IEnumerable<ActivityResponseDTO>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<IEnumerable<ActivityResponseDTO>>> GetByGradeId(int gradeId)
+        public async Task<ActionResult<IEnumerable<ActivityResponseDTO>>> GetByClassId(int classId)
         {
-            var activities = await _activityService.GetByGradeIdAsync(gradeId);
+            var activities = await _activityService.GetByClassIdAsync(classId);
             return Ok(activities);
         }
 

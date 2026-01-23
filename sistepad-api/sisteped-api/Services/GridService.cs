@@ -89,25 +89,44 @@ namespace SistepedApi.Services
             return await _gridRepository.AddGradeToGridAsync(dto.GridId, dto.GradeId);
         }
 
-        public async Task<bool> RemoveGradeFromGridAsync(int gradeId)
+        public async Task<bool> RemoveGradeFromGridAsync(int gridId, int gradeId)
         {
-            if (!await _gradeRepository.ExistsAsync(gradeId))
+            if (!await _gridRepository.ExistsAsync(gridId))
             {
-                throw new Exception("Série não encontrada.");
+                throw new Exception("Grade curricular não encontrada.");
             }
 
-            return await _gridRepository.RemoveGradeFromGridAsync(gradeId);
+            if (!await _gradeRepository.ExistsAsync(gradeId))
+            {
+                throw new Exception("Turma não encontrada.");
+            }
+
+            return await _gridRepository.RemoveGradeFromGridAsync(gridId, gradeId);
         }
 
         private GridResponseDTO MapToResponse(Grid grid)
         {
-            var grades = grid.Grades?.ToList() ?? new List<Grade>();
+            var gridGrades = grid.GridGrades?.ToList() ?? new List<GridGrade>();
+            var gridClasses = grid.GridClasses?.ToList() ?? new List<GridClass>();
             
-            var totalStudents = grades
-                .SelectMany(g => g.StudentGrades ?? new List<StudentGrade>())
+            // Total de classes únicas nesta grade curricular
+            var totalClasses = gridClasses
+                .Select(gc => gc.ClassId)
+                .Distinct()
+                .Count();
+            
+            // Total de alunos únicos vinculados às turmas desta grade curricular
+            // Alunos estão vinculados às turmas (Grade), e as turmas estão vinculadas ao Grid
+            var totalStudents = gridGrades
+                .SelectMany(gg => gg.Grade.StudentGrades ?? new List<StudentGrade>())
                 .Select(sg => sg.StudentId)
                 .Distinct()
                 .Count();
+
+            // IDs das turmas vinculadas
+            var gradeIds = gridGrades
+                .Select(gg => gg.GradeId)
+                .ToList();
 
             return new GridResponseDTO
             {
@@ -117,8 +136,8 @@ namespace SistepedApi.Services
                 Status = grid.Status,
                 CreatedAt = grid.CreatedAt,
                 UpdatedAt = grid.UpdatedAt,
-                Grades = grades.Select(g => g.Id).ToList(),
-                TotalClasses = grades.Count,
+                Grades = gradeIds,
+                TotalClasses = totalClasses,
                 TotalStudents = totalStudents
             };
         }

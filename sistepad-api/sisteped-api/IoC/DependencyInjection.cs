@@ -23,7 +23,8 @@ namespace SistepedApi.IoC
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IGradeService, GradeService>();
             services.AddScoped<IClassService, ClassService>();
-            services.AddScoped<IGradeClassService, GradeClassService>();
+            services.AddScoped<IGridGradeService, GridGradeService>();
+            services.AddScoped<IGridClassService, GridClassService>();
             services.AddScoped<IClassTeacherService, ClassTeacherService>();
             services.AddScoped<IStudentService, StudentService>();
             services.AddScoped<IStudentGradeService, StudentGradeService>();
@@ -51,7 +52,8 @@ namespace SistepedApi.IoC
             services.AddScoped<IUserCredentialRepository, UserCredentialRepository>();
             services.AddScoped<IGradeRepository, GradeRepository>();
             services.AddScoped<IClassRepository, ClassRepository>();
-            services.AddScoped<IGradeClassRepository, GradeClassRepository>();
+            services.AddScoped<IGridGradeRepository, GridGradeRepository>();
+            services.AddScoped<IGridClassRepository, GridClassRepository>();
             services.AddScoped<IClassTeacherRepository, ClassTeacherRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<IStudentGradeRepository, StudentGradeRepository>();

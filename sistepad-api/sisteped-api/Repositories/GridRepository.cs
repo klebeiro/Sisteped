@@ -22,8 +22,11 @@ namespace SistepedApi.Repositories
         public async Task<Grid?> GetByIdWithDetailsAsync(int id)
         {
             return await _context.Grids
-                .Include(g => g.Grades)
-                    .ThenInclude(gr => gr.StudentGrades)
+                .Include(g => g.GridGrades)
+                    .ThenInclude(gg => gg.Grade)
+                        .ThenInclude(gr => gr.StudentGrades)
+                .Include(g => g.GridClasses)
+                    .ThenInclude(gc => gc.Class)
                 .FirstOrDefaultAsync(g => g.Id == id);
         }
 
@@ -35,8 +38,11 @@ namespace SistepedApi.Repositories
         public async Task<IEnumerable<Grid>> GetAllWithDetailsAsync()
         {
             return await _context.Grids
-                .Include(g => g.Grades)
-                    .ThenInclude(gr => gr.StudentGrades)
+                .Include(g => g.GridGrades)
+                    .ThenInclude(gg => gg.Grade)
+                        .ThenInclude(gr => gr.StudentGrades)
+                .Include(g => g.GridClasses)
+                    .ThenInclude(gc => gc.Class)
                 .ToListAsync();
         }
 
@@ -84,20 +90,30 @@ namespace SistepedApi.Repositories
 
         public async Task<bool> AddGradeToGridAsync(int gridId, int gradeId)
         {
-            var grade = await _context.Grades.FindAsync(gradeId);
-            if (grade == null) return false;
+            // Verifica se já existe
+            if (await _context.GridGrades.AnyAsync(gg => gg.GridId == gridId && gg.GradeId == gradeId))
+                return false;
 
-            grade.GridId = gridId;
+            var gridGrade = new GridGrade
+            {
+                GridId = gridId,
+                GradeId = gradeId,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.GridGrades.Add(gridGrade);
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> RemoveGradeFromGridAsync(int gradeId)
+        public async Task<bool> RemoveGradeFromGridAsync(int gridId, int gradeId)
         {
-            var grade = await _context.Grades.FindAsync(gradeId);
-            if (grade == null) return false;
+            var gridGrade = await _context.GridGrades
+                .FirstOrDefaultAsync(gg => gg.GridId == gridId && gg.GradeId == gradeId);
+            
+            if (gridGrade == null) return false;
 
-            grade.GridId = null;
+            _context.GridGrades.Remove(gridGrade);
             await _context.SaveChangesAsync();
             return true;
         }

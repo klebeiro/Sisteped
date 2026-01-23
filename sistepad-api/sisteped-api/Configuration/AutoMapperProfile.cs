@@ -23,10 +23,19 @@ namespace SistepedApi.Configuration
             CreateMap<ClassCreateDTO, Class>();
             CreateMap<ClassUpdateDTO, Class>();
 
-            // GradeClass
-            CreateMap<GradeClass, GradeClassResponseDTO>()
+            // GridGrade
+            CreateMap<GridGrade, GridGradeResponseDTO>()
+                .ForMember(dest => dest.GridName, opt => opt.MapFrom(src => src.Grid.Name))
+                .ForMember(dest => dest.GridYear, opt => opt.MapFrom(src => src.Grid.Year))
                 .ForMember(dest => dest.GradeName, opt => opt.MapFrom(src => src.Grade.Name))
-                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name));
+                .ForMember(dest => dest.GradeLevel, opt => opt.MapFrom(src => src.Grade.Level))
+                .ForMember(dest => dest.GradeShift, opt => opt.MapFrom(src => src.Grade.Shift));
+
+            // GridClass
+            CreateMap<GridClass, GridClassResponseDTO>()
+                .ForMember(dest => dest.GridName, opt => opt.MapFrom(src => src.Grid.Name))
+                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
+                .ForMember(dest => dest.ClassCode, opt => opt.MapFrom(src => src.Class.Code));
 
             // ClassTeacher
             CreateMap<ClassTeacher, ClassTeacherResponseDTO>()
@@ -42,16 +51,21 @@ namespace SistepedApi.Configuration
             // StudentGrade
             CreateMap<StudentGrade, StudentGradeResponseDTO>()
                 .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Name))
-                .ForMember(dest => dest.GradeName, opt => opt.MapFrom(src => src.Grade.Name));
+                .ForMember(dest => dest.Enrollment, opt => opt.MapFrom(src => src.Student.Enrollment))
+                .ForMember(dest => dest.GradeName, opt => opt.MapFrom(src => src.Grade.Name))
+                .ForMember(dest => dest.GradeLevel, opt => opt.MapFrom(src => src.Grade.Level))
+                .ForMember(dest => dest.GradeShift, opt => opt.MapFrom(src => src.Grade.Shift));
 
             // Attendance
             CreateMap<Attendance, AttendanceResponseDTO>()
                 .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.Name))
-                .ForMember(dest => dest.GradeName, opt => opt.MapFrom(src => src.Grade.Name));
+                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
+                .ForMember(dest => dest.ClassCode, opt => opt.MapFrom(src => src.Class.Code));
 
             // Activity
             CreateMap<Activity, ActivityResponseDTO>()
-                .ForMember(dest => dest.GradeName, opt => opt.MapFrom(src => src.Grade.Name))
+                .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name))
+                .ForMember(dest => dest.ClassCode, opt => opt.MapFrom(src => src.Class.Code))
                 .ForMember(dest => dest.TotalStudents, opt => opt.MapFrom(src => src.StudentActivities.Count))
                 .ForMember(dest => dest.GradedStudents, opt => opt.MapFrom(src => src.StudentActivities.Count(sa => sa.Score.HasValue)))
                 .ForMember(dest => dest.AverageScore, opt => opt.MapFrom(src => 

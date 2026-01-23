@@ -185,14 +185,13 @@ namespace SistepedApi.Controllers
                 _context.Grids.Add(grid2026);
                 await _context.SaveChangesAsync();
 
-                // ===== GRADES (Séries) =====
+                // ===== GRADES (Séries/Turmas) =====
                 var serie1A = new Grade
                 {
                     Name = "1º Ano A",
                     Level = 1,
                     Shift = 1, // Manhã
                     Status = true,
-                    GridId = grid2025.Id,
                     CreatedAt = DateTime.Now
                 };
                 _context.Grades.Add(serie1A);
@@ -203,7 +202,6 @@ namespace SistepedApi.Controllers
                     Level = 1,
                     Shift = 2, // Tarde
                     Status = true,
-                    GridId = grid2025.Id,
                     CreatedAt = DateTime.Now
                 };
                 _context.Grades.Add(serie1B);
@@ -214,7 +212,6 @@ namespace SistepedApi.Controllers
                     Level = 2,
                     Shift = 1, // Manhã
                     Status = true,
-                    GridId = grid2025.Id,
                     CreatedAt = DateTime.Now
                 };
                 _context.Grades.Add(serie2A);
@@ -225,11 +222,20 @@ namespace SistepedApi.Controllers
                     Level = 3,
                     Shift = 3, // Noite
                     Status = true,
-                    GridId = grid2026.Id,
                     CreatedAt = DateTime.Now
                 };
                 _context.Grades.Add(serie3A);
 
+                await _context.SaveChangesAsync();
+
+                // ===== GRID_GRADES (Vincular Turmas às Grades Curriculares) =====
+                _context.GridGrades.AddRange(new[]
+                {
+                    new GridGrade { GridId = grid2025.Id, GradeId = serie1A.Id, CreatedAt = DateTime.Now },
+                    new GridGrade { GridId = grid2025.Id, GradeId = serie1B.Id, CreatedAt = DateTime.Now },
+                    new GridGrade { GridId = grid2025.Id, GradeId = serie2A.Id, CreatedAt = DateTime.Now },
+                    new GridGrade { GridId = grid2026.Id, GradeId = serie3A.Id, CreatedAt = DateTime.Now },
+                });
                 await _context.SaveChangesAsync();
 
                 // ===== CLASSES (Matérias) =====
@@ -285,20 +291,20 @@ namespace SistepedApi.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // ===== GRADE_CLASSES (Série x Matéria) =====
-                _context.GradeClasses.AddRange(new[]
+                // ===== GRID_CLASSES (Grade Curricular x Matéria) =====
+                _context.GridClasses.AddRange(new[]
                 {
-                    new GradeClass { GradeId = serie1A.Id, ClassId = matematica.Id, CreatedAt = DateTime.Now },
-                    new GradeClass { GradeId = serie1A.Id, ClassId = portugues.Id, CreatedAt = DateTime.Now },
-                    new GradeClass { GradeId = serie1A.Id, ClassId = ciencias.Id, CreatedAt = DateTime.Now },
-                    new GradeClass { GradeId = serie1B.Id, ClassId = matematica.Id, CreatedAt = DateTime.Now },
-                    new GradeClass { GradeId = serie1B.Id, ClassId = portugues.Id, CreatedAt = DateTime.Now },
-                    new GradeClass { GradeId = serie2A.Id, ClassId = matematica.Id, CreatedAt = DateTime.Now },
-                    new GradeClass { GradeId = serie2A.Id, ClassId = portugues.Id, CreatedAt = DateTime.Now },
-                    new GradeClass { GradeId = serie2A.Id, ClassId = historia.Id, CreatedAt = DateTime.Now },
-                    new GradeClass { GradeId = serie3A.Id, ClassId = matematica.Id, CreatedAt = DateTime.Now },
-                    new GradeClass { GradeId = serie3A.Id, ClassId = portugues.Id, CreatedAt = DateTime.Now },
-                    new GradeClass { GradeId = serie3A.Id, ClassId = geografia.Id, CreatedAt = DateTime.Now },
+                    // Grid 2025 (Ensino Fundamental I)
+                    new GridClass { GridId = grid2025.Id, ClassId = matematica.Id, CreatedAt = DateTime.Now },
+                    new GridClass { GridId = grid2025.Id, ClassId = portugues.Id, CreatedAt = DateTime.Now },
+                    new GridClass { GridId = grid2025.Id, ClassId = ciencias.Id, CreatedAt = DateTime.Now },
+                    new GridClass { GridId = grid2025.Id, ClassId = historia.Id, CreatedAt = DateTime.Now },
+                    new GridClass { GridId = grid2025.Id, ClassId = geografia.Id, CreatedAt = DateTime.Now },
+                    
+                    // Grid 2026 (Ensino Fundamental II)
+                    new GridClass { GridId = grid2026.Id, ClassId = matematica.Id, CreatedAt = DateTime.Now },
+                    new GridClass { GridId = grid2026.Id, ClassId = portugues.Id, CreatedAt = DateTime.Now },
+                    new GridClass { GridId = grid2026.Id, ClassId = geografia.Id, CreatedAt = DateTime.Now },
                 });
                 await _context.SaveChangesAsync();
 
@@ -382,15 +388,21 @@ namespace SistepedApi.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // ===== STUDENT_GRADES (Aluno x Série) =====
+                // ===== STUDENT_GRADES (Aluno x Turma) =====
+                // Alunos vinculados às turmas (que por sua vez estão vinculadas aos Grids)
                 _context.StudentGrades.AddRange(new[]
                 {
+                    // Alunos da turma 1º Ano A (Grid 2025)
                     new StudentGrade { StudentId = aluno1.Id, GradeId = serie1A.Id, CreatedAt = DateTime.Now },
                     new StudentGrade { StudentId = aluno2.Id, GradeId = serie1A.Id, CreatedAt = DateTime.Now },
-                    new StudentGrade { StudentId = aluno3.Id, GradeId = serie1B.Id, CreatedAt = DateTime.Now },
-                    new StudentGrade { StudentId = aluno4.Id, GradeId = serie2A.Id, CreatedAt = DateTime.Now },
+                    new StudentGrade { StudentId = aluno3.Id, GradeId = serie1A.Id, CreatedAt = DateTime.Now },
+                    
+                    // Alunos da turma 1º Ano B (Grid 2025)
+                    new StudentGrade { StudentId = aluno4.Id, GradeId = serie1B.Id, CreatedAt = DateTime.Now },
+                    new StudentGrade { StudentId = aluno6.Id, GradeId = serie1B.Id, CreatedAt = DateTime.Now },
+                    
+                    // Aluno da turma 3º Ano A (Grid 2026)
                     new StudentGrade { StudentId = aluno5.Id, GradeId = serie3A.Id, CreatedAt = DateTime.Now },
-                    new StudentGrade { StudentId = aluno6.Id, GradeId = serie1A.Id, CreatedAt = DateTime.Now },
                 });
                 await _context.SaveChangesAsync();
 
@@ -407,23 +419,29 @@ namespace SistepedApi.Controllers
                     if (data.DayOfWeek == DayOfWeek.Saturday || data.DayOfWeek == DayOfWeek.Sunday)
                         continue;
 
-                    // Aluno 1 - 1º Ano A (sempre presente)
-                    attendances.Add(new Attendance { StudentId = aluno1.Id, GradeId = serie1A.Id, Date = data, Present = true, CreatedAt = DateTime.Now });
+                    // Aluno 1 - Grid 2025 (sempre presente em Matemática)
+                    attendances.Add(new Attendance { StudentId = aluno1.Id, ClassId = matematica.Id, Date = data, Present = true, CreatedAt = DateTime.Now });
+                    attendances.Add(new Attendance { StudentId = aluno1.Id, ClassId = portugues.Id, Date = data, Present = true, CreatedAt = DateTime.Now });
                     
-                    // Aluno 2 - 1º Ano A (falta às vezes)
-                    attendances.Add(new Attendance { StudentId = aluno2.Id, GradeId = serie1A.Id, Date = data, Present = dia % 3 != 0, CreatedAt = DateTime.Now });
+                    // Aluno 2 - Grid 2025 (falta às vezes)
+                    attendances.Add(new Attendance { StudentId = aluno2.Id, ClassId = matematica.Id, Date = data, Present = dia % 3 != 0, CreatedAt = DateTime.Now });
+                    attendances.Add(new Attendance { StudentId = aluno2.Id, ClassId = portugues.Id, Date = data, Present = dia % 3 != 0, CreatedAt = DateTime.Now });
                     
-                    // Aluno 3 - 1º Ano B
-                    attendances.Add(new Attendance { StudentId = aluno3.Id, GradeId = serie1B.Id, Date = data, Present = dia % 4 != 0, CreatedAt = DateTime.Now });
+                    // Aluno 3 - Grid 2025
+                    attendances.Add(new Attendance { StudentId = aluno3.Id, ClassId = matematica.Id, Date = data, Present = dia % 4 != 0, CreatedAt = DateTime.Now });
+                    attendances.Add(new Attendance { StudentId = aluno3.Id, ClassId = portugues.Id, Date = data, Present = dia % 4 != 0, CreatedAt = DateTime.Now });
                     
-                    // Aluno 4 - 2º Ano A
-                    attendances.Add(new Attendance { StudentId = aluno4.Id, GradeId = serie2A.Id, Date = data, Present = true, CreatedAt = DateTime.Now });
+                    // Aluno 4 - Grid 2025
+                    attendances.Add(new Attendance { StudentId = aluno4.Id, ClassId = matematica.Id, Date = data, Present = true, CreatedAt = DateTime.Now });
+                    attendances.Add(new Attendance { StudentId = aluno4.Id, ClassId = historia.Id, Date = data, Present = true, CreatedAt = DateTime.Now });
                     
-                    // Aluno 5 - 3º Ano A (falta muito)
-                    attendances.Add(new Attendance { StudentId = aluno5.Id, GradeId = serie3A.Id, Date = data, Present = dia % 2 == 0, CreatedAt = DateTime.Now });
+                    // Aluno 5 - Grid 2026 (falta muito)
+                    attendances.Add(new Attendance { StudentId = aluno5.Id, ClassId = matematica.Id, Date = data, Present = dia % 2 == 0, CreatedAt = DateTime.Now });
+                    attendances.Add(new Attendance { StudentId = aluno5.Id, ClassId = geografia.Id, Date = data, Present = dia % 2 == 0, CreatedAt = DateTime.Now });
                     
-                    // Aluno 6 - 1º Ano A
-                    attendances.Add(new Attendance { StudentId = aluno6.Id, GradeId = serie1A.Id, Date = data, Present = dia != 5, CreatedAt = DateTime.Now });
+                    // Aluno 6 - Grid 2025
+                    attendances.Add(new Attendance { StudentId = aluno6.Id, ClassId = matematica.Id, Date = data, Present = dia != 5, CreatedAt = DateTime.Now });
+                    attendances.Add(new Attendance { StudentId = aluno6.Id, ClassId = portugues.Id, Date = data, Present = dia != 5, CreatedAt = DateTime.Now });
                 }
 
                 _context.Attendances.AddRange(attendances);
@@ -470,10 +488,13 @@ namespace SistepedApi.Controllers
             try
             {
                 // Ordem correta para evitar erros de FK
+                _context.StudentActivities.RemoveRange(_context.StudentActivities);
+                _context.Activities.RemoveRange(_context.Activities);
                 _context.Attendances.RemoveRange(_context.Attendances);
                 _context.StudentGrades.RemoveRange(_context.StudentGrades);
                 _context.ClassTeachers.RemoveRange(_context.ClassTeachers);
-                _context.GradeClasses.RemoveRange(_context.GradeClasses);
+                _context.GridClasses.RemoveRange(_context.GridClasses);
+                _context.GridGrades.RemoveRange(_context.GridGrades);
                 _context.Students.RemoveRange(_context.Students);
                 _context.Grades.RemoveRange(_context.Grades);
                 _context.Grids.RemoveRange(_context.Grids);

@@ -14,8 +14,8 @@ namespace SistepedApi.Validators.Activity
             RuleFor(x => x.Description)
                 .MaximumLength(1000).WithMessage("A descrição deve ter no máximo 1000 caracteres.");
 
-            RuleFor(x => x.GradeId)
-                .GreaterThan(0).WithMessage("A série é obrigatória.");
+            RuleFor(x => x.ClassId)
+                .GreaterThan(0).WithMessage("A matéria é obrigatória.");
 
             RuleFor(x => x.ApplicationDate)
                 .NotEmpty().WithMessage("A data de aplicação é obrigatória.");

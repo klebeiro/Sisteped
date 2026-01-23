@@ -26,14 +26,14 @@ namespace chronovault_api.Migrations
                     b.Property<DateTime>("ApplicationDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ClassId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("GradeId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<decimal>("MaxScore")
                         .HasColumnType("TEXT");
@@ -50,7 +50,7 @@ namespace chronovault_api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GradeId");
+                    b.HasIndex("ClassId");
 
                     b.ToTable("Activities");
                 });
@@ -61,14 +61,14 @@ namespace chronovault_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("ClassId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("GradeId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("Present")
                         .HasColumnType("INTEGER");
@@ -78,7 +78,7 @@ namespace chronovault_api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GradeId");
+                    b.HasIndex("ClassId");
 
                     b.HasIndex("StudentId");
 
@@ -149,9 +149,6 @@ namespace chronovault_api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("GridId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("Level")
                         .HasColumnType("INTEGER");
 
@@ -170,33 +167,7 @@ namespace chronovault_api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GridId");
-
                     b.ToTable("Grades");
-                });
-
-            modelBuilder.Entity("SistepedApi.Models.GradeClass", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ClassId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("GradeId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
-
-                    b.HasIndex("GradeId");
-
-                    b.ToTable("GradeClasses");
                 });
 
             modelBuilder.Entity("SistepedApi.Models.Grid", b =>
@@ -224,6 +195,54 @@ namespace chronovault_api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Grids");
+                });
+
+            modelBuilder.Entity("SistepedApi.Models.GridClass", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ClassId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("GridId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
+
+                    b.HasIndex("GridId");
+
+                    b.ToTable("GridClasses");
+                });
+
+            modelBuilder.Entity("SistepedApi.Models.GridGrade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("GradeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GridId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GradeId");
+
+                    b.HasIndex("GridId");
+
+                    b.ToTable("GridGrades");
                 });
 
             modelBuilder.Entity("SistepedApi.Models.Student", b =>
@@ -382,20 +401,20 @@ namespace chronovault_api.Migrations
 
             modelBuilder.Entity("SistepedApi.Models.Activity", b =>
                 {
-                    b.HasOne("SistepedApi.Models.Grade", "Grade")
+                    b.HasOne("SistepedApi.Models.Class", "Class")
                         .WithMany("Activities")
-                        .HasForeignKey("GradeId")
+                        .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Grade");
+                    b.Navigation("Class");
                 });
 
             modelBuilder.Entity("SistepedApi.Models.Attendance", b =>
                 {
-                    b.HasOne("SistepedApi.Models.Grade", "Grade")
-                        .WithMany()
-                        .HasForeignKey("GradeId")
+                    b.HasOne("SistepedApi.Models.Class", "Class")
+                        .WithMany("Attendances")
+                        .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -405,7 +424,7 @@ namespace chronovault_api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Grade");
+                    b.Navigation("Class");
 
                     b.Navigation("Student");
                 });
@@ -429,32 +448,42 @@ namespace chronovault_api.Migrations
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("SistepedApi.Models.Grade", b =>
-                {
-                    b.HasOne("SistepedApi.Models.Grid", "Grid")
-                        .WithMany("Grades")
-                        .HasForeignKey("GridId");
-
-                    b.Navigation("Grid");
-                });
-
-            modelBuilder.Entity("SistepedApi.Models.GradeClass", b =>
+            modelBuilder.Entity("SistepedApi.Models.GridClass", b =>
                 {
                     b.HasOne("SistepedApi.Models.Class", "Class")
-                        .WithMany("GradeClasses")
+                        .WithMany("GridClasses")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SistepedApi.Models.Grade", "Grade")
-                        .WithMany("GradeClasses")
-                        .HasForeignKey("GradeId")
+                    b.HasOne("SistepedApi.Models.Grid", "Grid")
+                        .WithMany("GridClasses")
+                        .HasForeignKey("GridId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Class");
 
+                    b.Navigation("Grid");
+                });
+
+            modelBuilder.Entity("SistepedApi.Models.GridGrade", b =>
+                {
+                    b.HasOne("SistepedApi.Models.Grade", "Grade")
+                        .WithMany("GridGrades")
+                        .HasForeignKey("GradeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SistepedApi.Models.Grid", "Grid")
+                        .WithMany("GridGrades")
+                        .HasForeignKey("GridId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Grade");
+
+                    b.Navigation("Grid");
                 });
 
             modelBuilder.Entity("SistepedApi.Models.Student", b =>
@@ -524,23 +553,27 @@ namespace chronovault_api.Migrations
 
             modelBuilder.Entity("SistepedApi.Models.Class", b =>
                 {
+                    b.Navigation("Activities");
+
+                    b.Navigation("Attendances");
+
                     b.Navigation("ClassTeachers");
 
-                    b.Navigation("GradeClasses");
+                    b.Navigation("GridClasses");
                 });
 
             modelBuilder.Entity("SistepedApi.Models.Grade", b =>
                 {
-                    b.Navigation("Activities");
-
-                    b.Navigation("GradeClasses");
+                    b.Navigation("GridGrades");
 
                     b.Navigation("StudentGrades");
                 });
 
             modelBuilder.Entity("SistepedApi.Models.Grid", b =>
                 {
-                    b.Navigation("Grades");
+                    b.Navigation("GridClasses");
+
+                    b.Navigation("GridGrades");
                 });
 
             modelBuilder.Entity("SistepedApi.Models.Student", b =>
