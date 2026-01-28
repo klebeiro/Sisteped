@@ -1,0 +1,25 @@
+services:
+  edusystem-api:
+    image: klebeiro/edusystem-api:latest
+    container_name: edusystem-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - DB_PATH=/app/data/sisteped.db
+    volumes:
+      - edusystem-api-data:/app/data
+    ports:
+      - "5138:8080"
+    restart: unless-stopped
+
+  edusystem:
+    image: ${DOCKERHUB_USER:-YOUR_DOCKERHUB_USER}/edusystem:latest
+    container_name: edusystem
+    ports:
+      - "80:80"
+    depends_on:
+      - edusystem-api
+    restart: unless-stopped
+
+volumes:
+  edusystem-api-data:
