@@ -13,7 +13,7 @@ services:
     restart: unless-stopped
 
   edusystem:
-    image: ${DOCKERHUB_USER:-YOUR_DOCKERHUB_USER}/edusystem:latest
+    image: klebeiro/edusystem:latest
     container_name: edusystem
     ports:
       - "80:80"
