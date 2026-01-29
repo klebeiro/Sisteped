@@ -20,6 +20,5 @@ services:
     depends_on:
       - edusystem-api
     restart: unless-stopped
-
 volumes:
   edusystem-api-data:
