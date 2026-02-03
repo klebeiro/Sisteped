@@ -7,6 +7,9 @@ Sistema completo de gestão educacional desenvolvido com arquitetura moderna, se
 docker compose pull
 docker compose up -d
 
+## Back-End: https://github.com/Weslley-hub/edusystem-api
+## Front-End: https://github.com/Weslley-hub/edusystem
+
 ## 📋 Índice
 
 - [Sobre o Projeto](#sobre-o-projeto)
